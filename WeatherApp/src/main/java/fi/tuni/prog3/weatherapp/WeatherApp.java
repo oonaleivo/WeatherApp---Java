@@ -46,6 +46,9 @@ public class WeatherApp extends Application {
         stage.setScene(scene);
         stage.setTitle("WeatherApp BY OONA JA REETTA");
         stage.show();
+        
+        weatherApiImpl location = new weatherApiImpl();
+        location.lookUpLocation(STYLESHEET_MODENA);
     }
 
     public static void main(String[] args) {
