@@ -48,7 +48,7 @@ public class WeatherApp extends Application {
         stage.show();
         
         weatherApiImpl location = new weatherApiImpl();
-        location.lookUpLocation(STYLESHEET_MODENA);
+        location.lookUpLocation("Lohja");
     }
 
     public static void main(String[] args) {

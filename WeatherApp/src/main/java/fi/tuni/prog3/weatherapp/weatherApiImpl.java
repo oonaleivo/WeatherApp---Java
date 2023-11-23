@@ -19,7 +19,7 @@ public class weatherApiImpl implements iAPI {
         String apiKey = "87fa00cc8d6158c3f7fe9efb4cb467cb";
         
         // Build the API URL
-        String apiUrl = String.format("http://api.openweathermap.org/geo/1.0/direct?q=%s,%s,%s&limit=%d&appid=%s",
+        String apiUrl = String.format("http://api.openweathermap.org/geo/1.0/direct?q=%s&limit=%d&appid=%s",
                 city, apiKey);
 
         // Create an HttpClient
@@ -44,8 +44,9 @@ public class weatherApiImpl implements iAPI {
                 double latitude = jsonArray.get(0).getAsJsonObject().get("lat").getAsDouble();
                 double longitude = jsonArray.get(0).getAsJsonObject().get("lon").getAsDouble();
 
-                System.out.println("Latitude: " + latitude);
-                System.out.println("Longitude: " + longitude);
+                System.out.printf("Latitude: %f%n", latitude);
+                System.out.printf("Longitude: %f%n", longitude);
+
             } else {
                 System.out.println("Failed to get location information. Status code: " + response.statusCode());
             }
