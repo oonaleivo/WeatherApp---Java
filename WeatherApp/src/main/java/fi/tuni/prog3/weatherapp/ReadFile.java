@@ -4,6 +4,8 @@
  */
 package fi.tuni.prog3.weatherapp;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,9 +24,24 @@ public class ReadFile implements iReadAndWriteToFile {
     }
 
     @Override
-    public String readFromFile(String fileName) throws IOException {
+    public boolean readFromFile(String fileName) throws IOException {
         Path filePath = Path.of(fileName);
-        return Files.readString(filePath);
+        String jsonData = Files.readString(filePath);
+
+        JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
+        
+        // Extracting required data
+        double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
+        double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble();
+        double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble();
+        double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble();
+        int clouds = jsonObject.getAsJsonObject("clouds").get("all").getAsInt();
+        int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
+
+        // Returning true
+        WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity);
+        
+        return true;
     }
 
     @Override
