@@ -18,6 +18,7 @@ import java.nio.file.StandardOpenOption;
 public class ReadFile implements iReadAndWriteToFile {
 
     private String dataToWrite; // Data to be written to the file
+    private String readData;
 
     public void setDataToWrite(String data) {
         this.dataToWrite = data;
@@ -26,9 +27,15 @@ public class ReadFile implements iReadAndWriteToFile {
     @Override
     public boolean readFromFile(String fileName) throws IOException {
         Path filePath = Path.of(fileName);
-        String jsonData = Files.readString(filePath);
-
-        JsonObject jsonObject = JsonParser.parseString(jsonData).getAsJsonObject();
+        readData = Files.readString(filePath);
+        
+        return true;
+        
+        //muuten palauta false
+    }
+    
+    public WeatherData getWeather() {
+        JsonObject jsonObject = JsonParser.parseString(readData).getAsJsonObject();
         
         // Extracting required data
         double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
@@ -38,10 +45,9 @@ public class ReadFile implements iReadAndWriteToFile {
         int clouds = jsonObject.getAsJsonObject("clouds").get("all").getAsInt();
         int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
 
-        // Returning true
         WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity);
         
-        return true;
+        return weatherData;
     }
 
     @Override

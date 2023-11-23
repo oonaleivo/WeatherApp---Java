@@ -20,11 +20,10 @@ public class weatherApiImpl implements iAPI {
         String coordinates = "";
         double latitude = 0.0;
         double longitude = 0.0;
-        String city = "Lohja";
         
         // Build the API URL
         String apiUrl = String.format("http://api.openweathermap.org/geo/1.0/direct?q=%s,%s&limit=%d&appid=%s",
-                city, "FI", 1, apiKey);
+                loc, "FI", 1, apiKey);
 
         // Create an HttpClient
         HttpClient httpClient = HttpClient.newHttpClient();

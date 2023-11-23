@@ -1,16 +1,13 @@
 package fi.tuni.prog3.weatherapp;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 //git add 
@@ -27,64 +24,31 @@ import javafx.stage.Stage;
 public class WeatherApp extends Application {
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
+        weatherApiImpl  weatherApi = new  weatherApiImpl();
+        weatherApi.lookUpLocation("Rovaniemi");
         
-        //Creating a new BorderPane.
-        BorderPane root = new BorderPane();
-        root.setPadding(new Insets(10, 10, 10, 10));
+        ReadFile file = new ReadFile();
+        file.readFromFile("weatherData");
+        WeatherData weather = file.getWeather();
         
-        //Adding HBox to the center of the BorderPane.
-        root.setCenter(getCenterVBox());
-        
-        //Adding button to the BorderPane and aligning it to the right.
-        var quitButton = getQuitButton();
-        BorderPane.setMargin(quitButton, new Insets(10, 10, 0, 10));
-        root.setBottom(quitButton);
-        BorderPane.setAlignment(quitButton, Pos.TOP_RIGHT);
-        
-        Scene scene = new Scene(root, 500, 700);                      
+        GridPane grid = new GridPane();
+
+        // Luodaan skene, johon ruudukko sijoitetaan
+        Scene scene = new Scene(grid, 350, 275);
         stage.setScene(scene);
-        stage.setTitle("WeatherApp BY OONA JA REETTA");
+        
+        String currentTemp = String.valueOf(weather.getCurrentTemp());
+        Label currentWeather = new Label(currentTemp);
+        grid.add(currentWeather, 2, 2);
+        
         stage.show();
         
-        weatherApiImpl location = new weatherApiImpl();
-        location.lookUpLocation("Lohja");
+     
     }
 
     public static void main(String[] args) {
         launch();
-    }
-    
-    private VBox getCenterVBox() {
-        //Creating an HBox.
-        VBox centerHBox = new VBox(10);
-        
-        //Adding two VBox to the HBox.
-        centerHBox.getChildren().addAll(getTopHBox(), getBottomHBox());
-        
-        return centerHBox;
-    }
-    
-    private HBox getTopHBox() {
-        //Creating a VBox for the left side.
-        HBox leftHBox = new HBox();
-        leftHBox.setPrefHeight(330);
-        leftHBox.setStyle("-fx-background-color: #8fc6fd;");
-        
-        leftHBox.getChildren().add(new Label("Top Panel jee"));
-        
-        return leftHBox;
-    }
-    
-    private HBox getBottomHBox() {
-        //Creating a VBox for the right side.
-        HBox rightHBox = new HBox();
-        rightHBox.setPrefHeight(330);
-        rightHBox.setStyle("-fx-background-color: #b1c2d4;");
-        
-        rightHBox.getChildren().add(new Label("Bottom Panel"));
-        
-        return rightHBox;
     }
     
     private Button getQuitButton() {
@@ -98,4 +62,6 @@ public class WeatherApp extends Application {
         
         return button;
     }
+    
+    
 }
