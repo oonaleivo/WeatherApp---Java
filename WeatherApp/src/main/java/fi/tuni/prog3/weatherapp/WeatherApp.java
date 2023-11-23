@@ -13,9 +13,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+//git add 
+//git stash --staged
+//git pull
+//git stash apply
+//git add
+//git commit
+//git push
 
 /**
- * JavaFX Sisu
+ * JavaFX WeatherApp
  */
 public class WeatherApp extends Application {
 
