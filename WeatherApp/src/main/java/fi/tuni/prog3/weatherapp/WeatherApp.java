@@ -37,7 +37,7 @@ public class WeatherApp extends Application {
         
         Scene scene = new Scene(root, 500, 700);                      
         stage.setScene(scene);
-        stage.setTitle("WeatherApp");
+        stage.setTitle("WeatherApp BY OONA JA REETTA");
         stage.show();
     }
 
