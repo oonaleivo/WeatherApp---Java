@@ -61,7 +61,7 @@ public class WeatherApp extends Application {
         leftHBox.setPrefHeight(330);
         leftHBox.setStyle("-fx-background-color: #8fc6fd;");
         
-        leftHBox.getChildren().add(new Label("Top Panel"));
+        leftHBox.getChildren().add(new Label("Top Panel jee"));
         
         return leftHBox;
     }
