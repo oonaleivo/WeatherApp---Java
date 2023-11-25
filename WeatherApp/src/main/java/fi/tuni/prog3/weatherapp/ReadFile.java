@@ -37,15 +37,18 @@ public class ReadFile implements iReadAndWriteToFile {
     public WeatherData getWeather() {
         JsonObject jsonObject = JsonParser.parseString(readData).getAsJsonObject();
         
-        // Extracting required data
-        double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
-        double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble();
-        double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble();
-        double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble();
+        // Extracting required data, minus 273.15 to convert kelvin to celcius
+        double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble() - 273.15;
+        double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble() - 273.15;
+        double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble() - 273.15;
+        double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble() - 273.15;
         int clouds = jsonObject.getAsJsonObject("clouds").get("all").getAsInt();
         int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
+        String cityName = jsonObject.get("name").getAsString();
+        //double rain = jsonObject.getAsJsonObject("rain").get("1h").getAsDouble();
+        double wind = jsonObject.getAsJsonObject("wind").get("speed").getAsDouble();
 
-        WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity);
+        WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind);
         
         return weatherData;
     }
