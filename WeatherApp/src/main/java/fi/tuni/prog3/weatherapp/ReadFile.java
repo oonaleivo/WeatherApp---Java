@@ -56,6 +56,10 @@ public class ReadFile implements iReadAndWriteToFile {
     public void getHourlyWeather() {
         
     }
+    
+    public void getDailyWeather() {
+        //DailyWeatherData(int date, double maxTemp, double minTemp, String description)
+    }
 
     @Override
     public boolean writeToFile(String fileName) throws IOException {

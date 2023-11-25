@@ -9,6 +9,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -38,7 +41,7 @@ public class WeatherApp extends Application {
         weather = file.getWeather();
         
         // Create the main sections
-        VBox menuSection = createMenuSection();
+        HBox menuSection = createMenuSection();
         GridPane currentSection = createCurrentSection();
         HBox hourlySection = createHourlySection();
         HBox dailySection = createDailySection();
@@ -58,18 +61,19 @@ public class WeatherApp extends Application {
      
     }
       
-    private VBox createMenuSection() {
+    private HBox createMenuSection() {
         // Add elements
-        Label titleLabel = new Label("Menu");
-        VBox topSection = new VBox(10);
-        topSection.setPadding(new Insets(10));
-        topSection.getChildren().addAll(titleLabel);
+        MenuBar menu = getMenuBar();
+        Button quit = getQuitButton();
+        HBox menuSection = new HBox(10);
+        menuSection.setPadding(new Insets(10));
+        menuSection.getChildren().addAll(menu, quit);
         
         // Set style
-        topSection.setStyle("-fx-background-color: lightgray;");
-        topSection.setPrefHeight(40);
+        menuSection.setStyle("-fx-background-color: lightgray;");
+        menuSection.setPrefHeight(40);
 
-        return topSection;
+        return menuSection;
     }
 
     private GridPane createCurrentSection() {
@@ -158,6 +162,29 @@ public class WeatherApp extends Application {
         });
         
         return button;
+    }
+    
+    private MenuBar getMenuBar() {
+        // Create a MenuBar
+        MenuBar menuBar = new MenuBar();
+
+        // Create a Menu
+        Menu menu = new Menu("Menu");
+
+        // Create MenuItems (buttons) for the dropdown menu
+        MenuItem menuItem1 = new MenuItem("Search and Favorites");
+        MenuItem menuItem2 = new MenuItem("Option 2");
+        MenuItem menuItem3 = new MenuItem("Option 3");
+        
+        // Add actions to the MenuItems
+        
+        // Add the MenuItems to the Menu
+        menu.getItems().addAll(menuItem1, menuItem2, menuItem3);
+
+        // Add the Menu to the MenuBar
+        menuBar.getMenus().add(menu);
+        
+        return menuBar;
     }
     
     public static void main(String[] args) {
