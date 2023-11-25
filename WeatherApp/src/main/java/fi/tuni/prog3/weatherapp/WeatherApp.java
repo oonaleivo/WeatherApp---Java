@@ -93,7 +93,8 @@ public class WeatherApp extends Application {
         String wind = String.format("wind: %.1f", weather.getWind());
         Label windLabel = new Label(wind);
         
-        Label kuva = new Label("kuva");
+        String humidity = String.format("humidity: %d", weather.getHumidity());
+        Label humLabel  = new Label(humidity);
 
         // Create GridPane
         GridPane currentSection = new GridPane();
@@ -103,11 +104,11 @@ public class WeatherApp extends Application {
         // Add labels to GridPane with specific column and row
         currentSection.add(titleLabel, 0, 0, 2, 1); // Span 2 columns
         currentSection.add(locationLabel, 0, 1);
-        currentSection.add(kuva, 0, 2, 2, 1);
         currentSection.add(tempLabel, 1, 2);
         currentSection.add(feelsLikeLabel, 1, 3);
         currentSection.add(rainLabel, 0, 4);
         currentSection.add(windLabel, 1, 4);
+        currentSection.add(humLabel, 2, 4);
 
         // Set style
         currentSection.setStyle("-fx-background-color: lightblue;");

@@ -8,12 +8,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-/**
- *
- * @author reett
- */
+// yhdistä toistuva koodi yhdeksi funktioksi?
+
 public class weatherApiImpl implements iAPI {
-    private String apiKey = "87fa00cc8d6158c3f7fe9efb4cb467cb";
+    private final String apiKey = "b201aa400ba5bdc211c7bbf93e38162f";
 
     @Override
     public String lookUpLocation(String loc) {
@@ -59,15 +57,17 @@ public class weatherApiImpl implements iAPI {
             System.err.println("Error making the API call: " + e.getMessage());
         }
         getCurrentWeather(latitude, longitude);
+        getHourlyForecast(latitude, longitude);
+        getDailyForecast(latitude, longitude);
         return coordinates;
     }
 
     @Override
     public String getCurrentWeather(double lat, double lon) {
-        String jsonData = "";
+        String currentJsonData = "";
         // Build the API URL
-        String apiUrl = String.format("https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s",
-                lat, lon, apiKey);
+        String apiUrl = String.format("https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&units=%s",
+                lat, lon, apiKey, "metric");
 
         // Create an HttpClient
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -83,13 +83,90 @@ public class weatherApiImpl implements iAPI {
 
             // Check if the request was successful (status code 200)
             if (response.statusCode() == 200) {
-                jsonData = response.body();
+                currentJsonData = response.body();
                 
                 //lisää tähän fileen tallennus
-                System.out.println(jsonData);
+                System.out.println(currentJsonData);
                 ReadFile file = new ReadFile();
-                file.setDataToWrite(jsonData);
+                file.setDataToWrite(currentJsonData);
                 file.writeToFile("weatherData");
+
+            } else {
+                System.out.println("Failed to get daily weather information. Status code: " + response.statusCode());
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error making the API call: " + e.getMessage());
+        }
+        return currentJsonData;
+    }
+
+    @Override
+    public String getHourlyForecast(double lat, double lon) {
+        String hourlyJsonData = "";
+        // Build the API URL
+        String apiUrl = String.format("https://api.openweathermap.org/data/2.5/forecast/hourly?lat=%f&lon=%f&appid=%s&units=%s",
+                lat, lon, apiKey, "metric");
+
+        // Create an HttpClient
+        HttpClient httpClient = HttpClient.newHttpClient();
+
+        // Create an HttpRequest
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .build();
+
+        try {
+            // Send the request and get the response
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            // Check if the request was successful (status code 200)
+            if (response.statusCode() == 200) {
+                hourlyJsonData = response.body();
+
+                // Add file writing here
+                System.out.println(hourlyJsonData);
+                ReadFile file = new ReadFile();
+                file.setDataToWrite(hourlyJsonData);
+                file.writeToFile("hourlyWeatherData");
+
+            } else {
+                System.out.println("Failed to get hourly forecast information. Status code: " + response.statusCode());
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error making the API call: " + e.getMessage());
+        }
+        return hourlyJsonData;
+}
+   
+    @Override
+    public String getDailyForecast(double lat, double lon) {
+                String dailyJsonData = "";
+        // Build the API URL
+        int numOfDays = 5;
+        String apiUrl = String.format("https://api.openweathermap.org/data/2.5/forecast/daily?lat=%f&lon=%f&cnt=%d&appid=%s&units=%s",
+                lat, lon, numOfDays, apiKey, "metric");
+
+        // Create an HttpClient
+        HttpClient httpClient = HttpClient.newHttpClient();
+
+        // Create an HttpRequest
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .build();
+        
+        try {
+            // Send the request and get the response
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            // Check if the request was successful (status code 200)
+            if (response.statusCode() == 200) {
+                dailyJsonData = response.body();
+                
+                //lisää tähän fileen tallennus
+                System.out.println(dailyJsonData);
+                ReadFile file = new ReadFile();
+                file.setDataToWrite(dailyJsonData);
+                file.writeToFile("dailyWeatherData");
 
             } else {
                 System.out.println("Failed to get weather information. Status code: " + response.statusCode());
@@ -97,12 +174,6 @@ public class weatherApiImpl implements iAPI {
         } catch (IOException | InterruptedException e) {
             System.err.println("Error making the API call: " + e.getMessage());
         }
-        return jsonData;
-    }
-
-    @Override
-    public String getForecast(double lat, double lon) {
-        // Implement the method
-        return "Weather forecast for " + lat + ", " + lon;
+        return dailyJsonData;
     }
 }

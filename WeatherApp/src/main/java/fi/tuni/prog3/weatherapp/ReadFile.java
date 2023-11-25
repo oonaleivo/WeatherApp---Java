@@ -17,7 +17,7 @@ import java.nio.file.StandardOpenOption;
  */
 public class ReadFile implements iReadAndWriteToFile {
 
-    private String dataToWrite; // Data to be written to the file
+    private String dataToWrite;
     private String readData;
 
     public void setDataToWrite(String data) {
@@ -38,10 +38,10 @@ public class ReadFile implements iReadAndWriteToFile {
         JsonObject jsonObject = JsonParser.parseString(readData).getAsJsonObject();
         
         // Extracting required data, minus 273.15 to convert kelvin to celcius
-        double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble() - 273.15;
-        double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble() - 273.15;
-        double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble() - 273.15;
-        double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble() - 273.15;
+        double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
+        double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble();
+        double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble();
+        double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble();
         int clouds = jsonObject.getAsJsonObject("clouds").get("all").getAsInt();
         int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
         String cityName = jsonObject.get("name").getAsString();
@@ -51,6 +51,10 @@ public class ReadFile implements iReadAndWriteToFile {
         WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind);
         
         return weatherData;
+    }
+    
+    public void getHourlyWeather() {
+        
     }
 
     @Override
