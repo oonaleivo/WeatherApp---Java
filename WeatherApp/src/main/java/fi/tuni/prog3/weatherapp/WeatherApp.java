@@ -1,15 +1,12 @@
 package fi.tuni.prog3.weatherapp;
 
 import java.io.IOException;
-<<<<<<< Updated upstream
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-=======
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
->>>>>>> Stashed changes
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
