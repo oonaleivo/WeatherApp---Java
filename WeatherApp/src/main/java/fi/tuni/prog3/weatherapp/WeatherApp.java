@@ -33,25 +33,38 @@ import javafx.stage.Stage;
 //git commit
 //git push
 
-/**
- * JavaFX WeatherApp
- */
+
+
+// koodeja pitää jaotella useampiin ryhmiin
+// päiväkohtainen ennuste sectio pitää tehdä
+// tuntikohtainen ennuste sectio pitää tehdä
+// pitää tallentaa viimesin haettu kaupunki
+// pitää asettaa rain 0 jos null
+// kuvat rain, wind, humidity ?
+// yksikkötestit
+
+// Kysy kooditoriossa:
+// tuntikohtaisen ennusteen hakeminen ei toimi
+// kuvien tiedostopolku
+// missä päiväkohtasessa ennusteessa lukee, että minkä päivän ennuste se on
+
 public class WeatherApp extends Application {
     private WeatherData weather;
     private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
+    private ImageView icon;
 
     @Override
     public void start(Stage stage) throws IOException {
         // get the weather
         weatherApiImpl  weatherApi = new  weatherApiImpl();
-        weatherApi.lookUpLocation("Rovaniemi");  
+        weatherApi.lookUpLocation("Joensuu");  
         ReadFile file = new ReadFile();
         file.readFromFile("weatherData");
         weather = file.getWeather();
         
         // Create the main sections
         HBox menuSection = createMenuSection();
-        GridPane currentSection = createCurrentSection();
+        HBox currentSection = createCurrentSection();
         HBox hourlySection = createHourlySection();
         HBox dailySection = createDailySection();
 
@@ -66,8 +79,7 @@ public class WeatherApp extends Application {
         // Set the stage properties
         stage.setTitle("OONAN JA REETAN WeatherApp");
         stage.setScene(scene);
-        stage.show();
-     
+        stage.show();    
     }
       
     private HBox createMenuSection() {
@@ -82,28 +94,38 @@ public class WeatherApp extends Application {
         return menuSection;
     }
     
-    private GridPane createCurrentSection() {
+    private HBox createCurrentSection() {
         locationLabel = new Label();
+        locationLabel.setStyle("-fx-font: 30 Calibri;");
         tempLabel = new Label();
+        tempLabel.setStyle("-fx-font: 40 Calibri;");
         feelsLikeLabel = new Label();
         rainLabel = new Label();
         windLabel = new Label();
         humLabel = new Label();
+        icon = getIcon();
+        
+        GridPane currentInfo = new GridPane();
+        currentInfo.setHgap(10);
+        currentInfo.setVgap(10);
  
-        GridPane currentSection = new GridPane();
-        currentSection.setHgap(10);
-        currentSection.setVgap(10);
+        // Add to column, row (column span, row span)
+        currentInfo.add(locationLabel, 0, 0,3,1);
+        currentInfo.add(tempLabel, 0, 1, 3,1);
+        currentInfo.add(feelsLikeLabel, 0, 2,3,1);
+        currentInfo.add(rainLabel, 0, 3);
+        currentInfo.add(windLabel, 1, 3);
+        currentInfo.add(humLabel, 2, 3);
  
-        currentSection.add(new Label("Tämän hetken sää"), 0, 0, 2, 1);
-        currentSection.add(locationLabel, 0, 1);
-        currentSection.add(tempLabel, 1, 2);
-        currentSection.add(feelsLikeLabel, 1, 3);
-        currentSection.add(rainLabel, 0, 4);
-        currentSection.add(windLabel, 1, 4);
-        currentSection.add(humLabel, 2, 4);
- 
-        currentSection.setStyle("-fx-background-color: lightblue;");
-        currentSection.setPrefHeight(220);
+        currentInfo.setStyle("-fx-background-color: lightgray;");
+        currentInfo.setPrefHeight(300);
+        currentInfo.setAlignment(Pos.CENTER);
+        
+        HBox currentSection = new HBox(30); 
+        currentSection.setPadding(new Insets(10));
+        currentSection.getChildren().addAll(icon, currentInfo);
+        currentSection.setStyle("-fx-background-color: lightgray;");
+        currentSection.setPrefHeight(300);
         currentSection.setAlignment(Pos.CENTER);
  
         updateCurrentWeatherSection();
@@ -111,7 +133,7 @@ public class WeatherApp extends Application {
         return currentSection;
     }
         
-        private void updateCurrentWeatherSection() {
+    private void updateCurrentWeatherSection() {
         if (weather != null) {
             locationLabel.setText(weather.getCityName());
             tempLabel.setText(String.format("%.1f ℃", weather.getCurrentTemp()));
@@ -119,41 +141,44 @@ public class WeatherApp extends Application {
             rainLabel.setText("rain");
             windLabel.setText(String.format("wind: %.1f", weather.getWind()));
             humLabel.setText(String.format("humidity: %d", weather.getHumidity()));
+            icon.setImage(getIcon().getImage());
+
+            System.out.println(weather.getWeatherCode());
         }
     }
     
     private HBox createHourlySection() {
         // Add elements
         Label footerLabel = new Label("tunti ennuste");
-        Label bottomLabel = new Label("Content for the section");
         HBox hourlySection = new HBox(10);
         hourlySection.setPadding(new Insets(10));
-        hourlySection.getChildren().addAll(footerLabel, bottomLabel);
+        hourlySection.getChildren().addAll(footerLabel);
 
         // Set style
         hourlySection.setStyle("-fx-background-color: lightgray;");
-        hourlySection.setPrefHeight(220);
+        hourlySection.setPrefHeight(180);
 
         return hourlySection;
     }
     
-       private HBox createDailySection() {
+    private HBox createDailySection() {
         // Add elements
         Label titleLabel = new Label("Lähipäivien ennuste");
-        Label topLabel = new Label("Content for thesection");
         HBox dailySection = new HBox(10);
         dailySection.setPadding(new Insets(10));
-        dailySection.getChildren().addAll(titleLabel, topLabel);
+        dailySection.getChildren().addAll(titleLabel);
 
         // Set style
-        dailySection.setStyle("-fx-background-color: lightblue;");
-        dailySection.setPrefHeight(220);
+        dailySection.setStyle("-fx-background-color: lightgrey;");
+        dailySection.setPrefHeight(180);
 
         return dailySection;
     }
        
     private ImageView getIcon() {
        int weatherCode = weather.getWeatherCode();
+       
+       System.out.println(weather.getWeatherCode());
        
        List<Integer> thunderstorm = new ArrayList<>(Arrays.asList(200, 201, 202, 210, 211, 212, 221, 230, 231, 232));
        List<Integer> drizzle = new ArrayList<>(Arrays.asList(300, 301, 302, 310, 311, 312, 313, 314, 321));
@@ -162,34 +187,35 @@ public class WeatherApp extends Application {
        List<Integer> atmosphere = new ArrayList<>(Arrays.asList(701, 711, 721, 731, 741, 751, 761, 762, 771, 781));
        List<Integer> clouds = new ArrayList<>(Arrays.asList(801, 802, 803, 804));
        
+       System.out.println(weatherCode);
        // clear sky by defalt 
-       Image icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\sun.png");
+       Image weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\sun.png");
 
        if (thunderstorm.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\storm.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\storm.png");
        }
        else if (drizzle.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\drizzle.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\drizzle.png");
        }
        else if (rain.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\rain.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\rain.png");
        }
        else if (snow.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\snowy.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\snowy.png");
        }
        else if (atmosphere.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
        }
        else if (atmosphere.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
        }
        else if (clouds.contains(weatherCode)) {
-           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\cloud.png");
+           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\cloud.png");
        }
               
-        ImageView imageView = new ImageView(icon);
-        imageView.setFitWidth(100); 
-        imageView.setFitHeight(100); 
+        ImageView imageView = new ImageView(weatherIcon);
+        imageView.setFitWidth(200); 
+        imageView.setFitHeight(200); 
         
         return imageView;
     }
@@ -217,76 +243,76 @@ public class WeatherApp extends Application {
     
     private Stage searchStage;
     
-private void openSearchWindow() {
-    if (searchStage == null) {
-        searchStage = new Stage();
+    private void openSearchWindow() {
+        if (searchStage == null) {
+            searchStage = new Stage();
 
-        // Top section: TextField and Button
-        VBox topSection = new VBox(10);
-        topSection.setAlignment(Pos.CENTER); // Center align the entire top section
-       
-        Text infoText = new Text(""); // Info text field
-        infoText.setFill(Color.RED); // Set text color to red
-        
-        TextField cityTextField = new TextField();
-        cityTextField.setPromptText("Enter city name");
-        cityTextField.setMaxWidth(200);
+            // Top section: TextField and Button
+            VBox topSection = new VBox(10);
+            topSection.setAlignment(Pos.CENTER); // Center align the entire top section
 
-        Button searchButton = new Button("Search");
-        searchButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
-        searchButton.setOnAction(e -> {
-            performSearch(cityTextField.getText());
-            searchStage.close();
-        });
+            Text infoText = new Text(""); // Info text field
+            infoText.setFill(Color.RED); // Set text color to red
 
-        Button addToFavoritesButton = new Button("Add to Favorites");
-        addToFavoritesButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
-        addToFavoritesButton.setOnAction(e -> {
-            String cityName = cityTextField.getText();
-            if (cityName.isEmpty()) {
-                infoText.setText("Please type a city name.");
-            } else {
-                addToFavorites(cityName);
-                infoText.setText("Favorite successfully saved!");
+            TextField cityTextField = new TextField();
+            cityTextField.setPromptText("Enter city name");
+            cityTextField.setMaxWidth(200);
+
+            Button searchButton = new Button("Search");
+            searchButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
+            searchButton.setOnAction(e -> {
+                performSearch(cityTextField.getText());
                 searchStage.close();
-            }
-        });
+            });
 
-        HBox buttonLayout = new HBox(10, searchButton, addToFavoritesButton);
-        buttonLayout.setAlignment(Pos.CENTER); // Center align the buttons within the HBox
-        
-        topSection.getChildren().addAll(infoText, cityTextField, buttonLayout);
-      
-        // Main layout
-        VBox mainLayout = new VBox(30);
-        mainLayout.getChildren().add(topSection);
-        mainLayout.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
+            Button addToFavoritesButton = new Button("Add to Favorites");
+            addToFavoritesButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
+            addToFavoritesButton.setOnAction(e -> {
+                String cityName = cityTextField.getText();
+                if (cityName.isEmpty()) {
+                    infoText.setText("Please type a city name.");
+                } else {
+                    addToFavorites(cityName);
+                    infoText.setText("Favorite successfully saved!");
+                    searchStage.close();
+                }
+            });
 
-        Scene scene = new Scene(mainLayout, 300, 300);
-        searchStage.setScene(scene);
-        searchStage.setTitle("City Search & Favorites:");
-        
-         Platform.runLater(() -> mainLayout.requestFocus());
+            HBox buttonLayout = new HBox(10, searchButton, addToFavoritesButton);
+            buttonLayout.setAlignment(Pos.CENTER); // Center align the buttons within the HBox
+
+            topSection.getChildren().addAll(infoText, cityTextField, buttonLayout);
+
+            // Main layout
+            VBox mainLayout = new VBox(30);
+            mainLayout.getChildren().add(topSection);
+            mainLayout.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
+
+            Scene scene = new Scene(mainLayout, 300, 300);
+            searchStage.setScene(scene);
+            searchStage.setTitle("City Search & Favorites:");
+
+             Platform.runLater(() -> mainLayout.requestFocus());
+        }
+        // Show the stage without re-creating the UI components
+        searchStage.show();
+
+        // Optional: If you need to reset or update any components when the window is opened, do it here.
+        // For example, you might want to clear the text field or update a list.
     }
-    // Show the stage without re-creating the UI components
-    searchStage.show();
 
-    // Optional: If you need to reset or update any components when the window is opened, do it here.
-    // For example, you might want to clear the text field or update a list.
-}
-    
-private void performSearch(String cityName) {
-    weatherApiImpl weatherApi = new weatherApiImpl();
-    weatherApi.lookUpLocation(cityName);
+    private void performSearch(String cityName) {
+        weatherApiImpl weatherApi = new weatherApiImpl();
+        weatherApi.lookUpLocation(cityName);
 
-    try {
-        ReadFile file = new ReadFile();
-        file.readFromFile("weatherData");
-        weather = file.getWeather();
-        Platform.runLater(this::updateCurrentWeatherSection);
-    } catch (IOException e) {
+        try {
+            ReadFile file = new ReadFile();
+            file.readFromFile("weatherData");
+            weather = file.getWeather();
+            Platform.runLater(this::updateCurrentWeatherSection);
+        } catch (IOException e) {
+        }
     }
-}
 
     private void addToFavorites(String cityName) {
         try {
