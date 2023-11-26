@@ -1,9 +1,15 @@
 package fi.tuni.prog3.weatherapp;
 
 import java.io.IOException;
+<<<<<<< Updated upstream
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+=======
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+>>>>>>> Stashed changes
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -18,6 +24,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 //git add 
@@ -33,7 +41,7 @@ import javafx.stage.Stage;
  */
 public class WeatherApp extends Application {
     private WeatherData weather;
-    private Label locationLabel, tempLabel, feelsLikeLabel, feelLikeLabel, rainLabel, windLabel, humLabel;
+    private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -210,38 +218,65 @@ public class WeatherApp extends Application {
         return  searchButton;
     }
     
-    private void openSearchWindow() {
-        Stage searchStage = new Stage();
+    private Stage searchStage;
+    
+private void openSearchWindow() {
+    if (searchStage == null) {
+        searchStage = new Stage();
 
         // Top section: TextField and Button
-        VBox topSection = new VBox(20);
+        VBox topSection = new VBox(10);
+        topSection.setAlignment(Pos.CENTER); // Center align the entire top section
+       
+        Text infoText = new Text(""); // Info text field
+        infoText.setFill(Color.RED); // Set text color to red
+        
         TextField cityTextField = new TextField();
         cityTextField.setPromptText("Enter city name");
-        cityTextField.setMaxWidth(200); // Set the max width of the text field
+        cityTextField.setMaxWidth(200);
 
         Button searchButton = new Button("Search");
-        searchButton.setOnAction(e -> { performSearch(cityTextField.getText());
-                  searchStage.close(); }); // Close the search window  );
-        topSection.getChildren().addAll(cityTextField, searchButton);
-        topSection.setAlignment(Pos.CENTER); // Center align elements in the top section
+        searchButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
+        searchButton.setOnAction(e -> {
+            performSearch(cityTextField.getText());
+            searchStage.close();
+        });
 
+        Button addToFavoritesButton = new Button("Add to Favorites");
+        addToFavoritesButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
+        addToFavoritesButton.setOnAction(e -> {
+            String cityName = cityTextField.getText();
+            if (cityName.isEmpty()) {
+                infoText.setText("Please type a city name.");
+            } else {
+                addToFavorites(cityName);
+                infoText.setText("Favorite successfully saved!");
+                searchStage.close();
+            }
+        });
+
+        HBox buttonLayout = new HBox(10, searchButton, addToFavoritesButton);
+        buttonLayout.setAlignment(Pos.CENTER); // Center align the buttons within the HBox
+        
+        topSection.getChildren().addAll(infoText, cityTextField, buttonLayout);
+      
         // Main layout
-        VBox mainLayout = new VBox(20); // Use a larger spacing to separate the top section from the rest
+        VBox mainLayout = new VBox(30);
         mainLayout.getChildren().add(topSection);
-        // Additional elements can be added to mainLayout here
+        mainLayout.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
 
-        // Style the main layout
-        mainLayout.setStyle("-fx-background-color: lightblue; -fx-padding: 10;");
-
-        Scene scene = new Scene(mainLayout, 300, 300); // Adjust window size as needed
+        Scene scene = new Scene(mainLayout, 300, 300);
         searchStage.setScene(scene);
         searchStage.setTitle("City Search & Favorites:");
-        searchStage.show();
         
-            // Move the focus away from the TextField to show the prompt text
-        Platform.runLater(() -> mainLayout.requestFocus());
+         Platform.runLater(() -> mainLayout.requestFocus());
     }
+    // Show the stage without re-creating the UI components
+    searchStage.show();
 
+    // Optional: If you need to reset or update any components when the window is opened, do it here.
+    // For example, you might want to clear the text field or update a list.
+}
     
 private void performSearch(String cityName) {
     weatherApiImpl weatherApi = new weatherApiImpl();
@@ -255,6 +290,18 @@ private void performSearch(String cityName) {
     } catch (IOException e) {
     }
 }
+
+    private void addToFavorites(String cityName) {
+        try {
+            Path filePath = Path.of("favorites");
+            if (!Files.exists(filePath)) {
+                Files.createFile(filePath);
+            }
+            Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
+        } catch (IOException ex) {
+            // Handle the exception as per your requirement
+        }
+    }
 
     public static void main(String[] args) {
         launch();

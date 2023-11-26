@@ -1,5 +1,9 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 {"coord":{"lon":25.7192,"lat":66.4976},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01d"}],"base":"stations","main":{"temp":-14.25,"feels_like":-20.74,"temp_min":-14.25,"temp_max":-14.25,"pressure":1011,"humidity":92},"visibility":10000,"wind":{"speed":3.09,"deg":40},"clouds":{"all":0},"dt":1700999669,"sys":{"type":1,"id":1354,"country":"FI","sunrise":1700985120,"sunset":1701001015},"timezone":7200,"id":638936,"name":"Rovaniemi","cod":200}
 =======
 {"coord":{"lon":25.7192,"lat":66.4976},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01n"}],"base":"stations","main":{"temp":-14.25,"feels_like":-19.16,"temp_min":-14.25,"temp_max":-14.25,"pressure":1011,"humidity":85},"visibility":10000,"wind":{"speed":2.06,"deg":30},"clouds":{"all":0},"dt":1701004564,"sys":{"type":1,"id":1354,"country":"FI","sunrise":1700985120,"sunset":1701001015},"timezone":7200,"id":638936,"name":"Rovaniemi","cod":200}
+>>>>>>> Stashed changes
+=======
+{"coord":{"lon":23.7603,"lat":61.498},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01d"}],"base":"stations","main":{"temp":-10.52,"feels_like":-15.73,"temp_min":-12.82,"temp_max":-10.52,"pressure":1008,"humidity":92},"visibility":10000,"wind":{"speed":2.68,"deg":53,"gust":4.02},"clouds":{"all":0},"dt":1701004968,"sys":{"type":2,"id":2081862,"country":"FI","sunrise":1700982024,"sunset":1701005052},"timezone":7200,"id":661226,"name":"Amuri","cod":200}
 >>>>>>> Stashed changes
