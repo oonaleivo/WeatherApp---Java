@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -30,6 +31,7 @@ import javafx.stage.Stage;
  */
 public class WeatherApp extends Application {
     private WeatherData weather;
+    private Label locationLabel, tempLabel, feelsLikeLabel, feelLikeLabel, rainLabel, windLabel, humLabel;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -62,51 +64,30 @@ public class WeatherApp extends Application {
     }
       
     private HBox createMenuSection() {
-        // Add elements
         Button search = getSearchButton();
         Button quit = getQuitButton();
         HBox menuSection = new HBox(10);
         menuSection.setPadding(new Insets(10));
         menuSection.getChildren().addAll(search, quit);
-        
-        // Set style
         menuSection.setStyle("-fx-background-color: lightgray;");
         menuSection.setPrefHeight(40);
 
         return menuSection;
     }
+    
+        private GridPane createCurrentSection() {
+        locationLabel = new Label();
+        tempLabel = new Label();
+        feelsLikeLabel = new Label();
+        rainLabel = new Label();
+        windLabel = new Label();
+        humLabel = new Label();
 
-    private GridPane createCurrentSection() {
-        // Add elements
-        Label titleLabel = new Label("Tämän hetken sää");
-
-        String location = weather.getCityName();
-        Label locationLabel = new Label(location);
-        locationLabel.setStyle("-fx-font-size: 24;");
-
-        String temp = String.format("%.1f ℃", weather.getCurrentTemp());
-        Label tempLabel = new Label(temp);
-        tempLabel.setStyle("-fx-font-size: 30;");
-        
-        String tempFeelsLike = String.format("Feels like %.1f ℃", weather.getFeelsLike());
-        Label feelsLikeLabel = new Label(tempFeelsLike);
-        
-        //String rain = String.format("rain: %.1f", weather.getRain());
-        Label rainLabel = new Label("rain");
-        
-        String wind = String.format("wind: %.1f", weather.getWind());
-        Label windLabel = new Label(wind);
-        
-        String humidity = String.format("humidity: %d", weather.getHumidity());
-        Label humLabel  = new Label(humidity);
-
-        // Create GridPane
         GridPane currentSection = new GridPane();
         currentSection.setHgap(10);
         currentSection.setVgap(10);
 
-        // Add labels to GridPane with specific column and row
-        currentSection.add(titleLabel, 0, 0, 2, 1); // Span 2 columns
+        currentSection.add(new Label("Tämän hetken sää"), 0, 0, 2, 1);
         currentSection.add(locationLabel, 0, 1);
         currentSection.add(tempLabel, 1, 2);
         currentSection.add(feelsLikeLabel, 1, 3);
@@ -114,14 +95,26 @@ public class WeatherApp extends Application {
         currentSection.add(windLabel, 1, 4);
         currentSection.add(humLabel, 2, 4);
 
-        // Set style
         currentSection.setStyle("-fx-background-color: lightblue;");
         currentSection.setPrefHeight(220);
         currentSection.setAlignment(Pos.CENTER);
 
+        updateCurrentWeatherSection();
+
         return currentSection;
     }
-
+        
+        private void updateCurrentWeatherSection() {
+        if (weather != null) {
+            locationLabel.setText(weather.getCityName());
+            tempLabel.setText(String.format("%.1f ℃", weather.getCurrentTemp()));
+            feelsLikeLabel.setText(String.format("Feels like %.1f ℃", weather.getFeelsLike()));
+            rainLabel.setText("rain");
+            windLabel.setText(String.format("wind: %.1f", weather.getWind()));
+            humLabel.setText(String.format("humidity: %d", weather.getHumidity()));
+        }
+    }
+    
     private HBox createHourlySection() {
         // Add elements
         Label footerLabel = new Label("tunti ennuste");
@@ -174,9 +167,51 @@ public class WeatherApp extends Application {
     }
     
     private void openSearchWindow() {
+        Stage searchStage = new Stage();
+
+        // Top section: TextField and Button
+        VBox topSection = new VBox(20);
+        TextField cityTextField = new TextField();
+        cityTextField.setPromptText("Enter city name");
+        cityTextField.setMaxWidth(200); // Set the max width of the text field
+
+        Button searchButton = new Button("Search");
+        searchButton.setOnAction(e -> { performSearch(cityTextField.getText());
+                  searchStage.close(); }); // Close the search window  );
+        topSection.getChildren().addAll(cityTextField, searchButton);
+        topSection.setAlignment(Pos.CENTER); // Center align elements in the top section
+
+        // Main layout
+        VBox mainLayout = new VBox(20); // Use a larger spacing to separate the top section from the rest
+        mainLayout.getChildren().add(topSection);
+        // Additional elements can be added to mainLayout here
+
+        // Style the main layout
+        mainLayout.setStyle("-fx-background-color: lightblue; -fx-padding: 10;");
+
+        Scene scene = new Scene(mainLayout, 300, 300); // Adjust window size as needed
+        searchStage.setScene(scene);
+        searchStage.setTitle("City Search & Favorites:");
+        searchStage.show();
         
+            // Move the focus away from the TextField to show the prompt text
+        Platform.runLater(() -> mainLayout.requestFocus());
     }
+
     
+private void performSearch(String cityName) {
+    weatherApiImpl weatherApi = new weatherApiImpl();
+    weatherApi.lookUpLocation(cityName);
+
+    try {
+        ReadFile file = new ReadFile();
+        file.readFromFile("weatherData");
+        weather = file.getWeather();
+        Platform.runLater(this::updateCurrentWeatherSection);
+    } catch (IOException e) {
+    }
+}
+
     public static void main(String[] args) {
         launch();
     }
