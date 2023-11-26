@@ -16,7 +16,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -255,8 +254,8 @@ public class WeatherApp extends Application {
     private Stage searchStage;
     
     private void openSearchWindow() {
-        if (searchStage == null) {
-            searchStage = new Stage();
+    if (searchStage == null) {
+        searchStage = new Stage();
 
         // Top section: TextField and Button
         VBox topSection = new VBox(10);
@@ -269,8 +268,12 @@ public class WeatherApp extends Application {
         cityTextField.setPromptText("Enter city name");
         cityTextField.setMaxWidth(200);
 
-            Text infoText = new Text(""); // Info text field
-            infoText.setFill(Color.RED); // Set text color to red
+        Button searchButton = new Button("Search");
+        searchButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
+        searchButton.setOnAction(e -> {
+            performSearch(cityTextField.getText());
+            searchStage.close();
+        });
 
         Button addToFavoritesButton = new Button("Add to Favorites");
         addToFavoritesButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
@@ -309,28 +312,14 @@ public class WeatherApp extends Application {
         mainLayout.getChildren().add(topSection);
         mainLayout.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
 
-            HBox buttonLayout = new HBox(10, searchButton, addToFavoritesButton);
-            buttonLayout.setAlignment(Pos.CENTER); // Center align the buttons within the HBox
-
-            topSection.getChildren().addAll(infoText, cityTextField, buttonLayout);
-
-            // Main layout
-            VBox mainLayout = new VBox(30);
-            mainLayout.getChildren().add(topSection);
-            mainLayout.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
-
-            Scene scene = new Scene(mainLayout, 300, 300);
-            searchStage.setScene(scene);
-            searchStage.setTitle("City Search & Favorites:");
-
-             Platform.runLater(() -> mainLayout.requestFocus());
-        }
-        // Show the stage without re-creating the UI components
-        searchStage.show();
-
-        // Optional: If you need to reset or update any components when the window is opened, do it here.
-        // For example, you might want to clear the text field or update a list.
+        Scene scene = new Scene(mainLayout, 300, 300);
+        searchStage.setScene(scene);
+        searchStage.setTitle("City Search & Favorites:");
+        
+         Platform.runLater(() -> mainLayout.requestFocus());
     }
+    // Show the stage without re-creating the UI components
+    searchStage.show();
 
     // Optional: If you need to reset or update any components when the window is opened, do it here.
     // For example, you might want to clear the text field or update a list.
@@ -349,41 +338,40 @@ public class WeatherApp extends Application {
             e.printStackTrace(); // Handle exception
         }
     }
-
-
-private void addToFavorites(String cityName) {
-    try {
-        Path filePath = Paths.get("favorites");
-        if (!Files.exists(filePath)) {
-            Files.createFile(filePath);
-        }
-
-        // Read all lines from the file and trim each line
-        List<String> favorites = Files.readAllLines(filePath).stream()
-                                       .map(String::trim) // Remove leading and trailing whitespace
-                                       .map(String::toLowerCase) // Convert to lower case for case-insensitive comparison
-                                       .collect(Collectors.toList());
-
-        // Process the input city name similarly
-        String processedCityName = cityName.trim().toLowerCase();
-
-        if (!favorites.contains(processedCityName)) {
-            Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
-            loadFavorites(); // Reload favorites to include the new city
-            secondWindowInfoText.setText("Favorite successfully saved!");
-        } else {
-            secondWindowInfoText.setText("City is already a favorite.");
-        }
-    } catch (IOException ex) {
-        ex.printStackTrace(); // Handle the exception
-    }
-}
-
-
     
-private void performSearch(String cityName) {
-    weatherApiImpl weatherApi = new weatherApiImpl();
-    weatherApi.lookUpLocation(cityName);
+    private void addToFavorites(String cityName) {
+        try {
+            Path filePath = Paths.get("favorites");
+            if (!Files.exists(filePath)) {
+                Files.createFile(filePath);
+            }
+
+            // Read all lines from the file and trim each line
+            List<String> favorites = Files.readAllLines(filePath).stream()
+                                           .map(String::trim) // Remove leading and trailing whitespace
+                                           .map(String::toLowerCase) // Convert to lower case for case-insensitive comparison
+                                           .collect(Collectors.toList());
+
+            // Process the input city name similarly
+            String processedCityName = cityName.trim().toLowerCase();
+
+            if (!favorites.contains(processedCityName)) {
+                Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
+                loadFavorites(); // Reload favorites to include the new city
+                secondWindowInfoText.setText("Favorite successfully saved!");
+            } else {
+                secondWindowInfoText.setText("City is already a favorite.");
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace(); // Handle the exception
+        }
+    }
+
+
+
+    private void performSearch(String cityName) {
+        weatherApiImpl weatherApi = new weatherApiImpl();
+        weatherApi.lookUpLocation(cityName);
 
         try {
             ReadFile file = new ReadFile();
@@ -394,7 +382,7 @@ private void performSearch(String cityName) {
         }
     }
 
-    public static void main(String[] args) {
-        launch();
+        public static void main(String[] args) {
+            launch();
+        }
     }
-}
