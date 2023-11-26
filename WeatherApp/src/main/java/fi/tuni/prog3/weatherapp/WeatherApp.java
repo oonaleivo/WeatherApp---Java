@@ -1,6 +1,7 @@
 package fi.tuni.prog3.weatherapp;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -9,9 +10,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -63,11 +63,11 @@ public class WeatherApp extends Application {
       
     private HBox createMenuSection() {
         // Add elements
-        MenuBar menu = getMenuBar();
+        Button search = getSearchButton();
         Button quit = getQuitButton();
         HBox menuSection = new HBox(10);
         menuSection.setPadding(new Insets(10));
-        menuSection.getChildren().addAll(menu, quit);
+        menuSection.getChildren().addAll(search, quit);
         
         // Set style
         menuSection.setStyle("-fx-background-color: lightgray;");
@@ -154,37 +154,27 @@ public class WeatherApp extends Application {
     
     private Button getQuitButton() {
         //Creating a button.
-        Button button = new Button("Quit");
+        Button quitButton = new Button("Quit");
         
         //Adding an event to the button to terminate the application.
-        button.setOnAction((ActionEvent event) -> {
+        quitButton.setOnAction((ActionEvent event) -> {
             Platform.exit();
         });
         
-        return button;
+        return quitButton;
     }
     
-    private MenuBar getMenuBar() {
+    private Button getSearchButton() {
         // Create a MenuBar
-        MenuBar menuBar = new MenuBar();
-
-        // Create a Menu
-        Menu menu = new Menu("Menu");
-
-        // Create MenuItems (buttons) for the dropdown menu
-        MenuItem menuItem1 = new MenuItem("Search and Favorites");
-        MenuItem menuItem2 = new MenuItem("Option 2");
-        MenuItem menuItem3 = new MenuItem("Option 3");
+        Button searchButton = new Button("Search and Favorites");
         
-        // Add actions to the MenuItems
+        searchButton.setOnAction(e -> openSearchWindow());
         
-        // Add the MenuItems to the Menu
-        menu.getItems().addAll(menuItem1, menuItem2, menuItem3);
-
-        // Add the Menu to the MenuBar
-        menuBar.getMenus().add(menu);
+        return  searchButton;
+    }
+    
+    private void openSearchWindow() {
         
-        return menuBar;
     }
     
     public static void main(String[] args) {

@@ -47,8 +47,9 @@ public class ReadFile implements iReadAndWriteToFile {
         String cityName = jsonObject.get("name").getAsString();
         //double rain = jsonObject.getAsJsonObject("rain").get("1h").getAsDouble();
         double wind = jsonObject.getAsJsonObject("wind").get("speed").getAsDouble();
+        String description = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("description").getAsString();
 
-        WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind);
+        WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind, description);
         
         return weatherData;
     }
