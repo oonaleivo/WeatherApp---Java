@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -14,7 +16,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -39,7 +45,11 @@ import javafx.stage.Stage;
 public class WeatherApp extends Application {
     private WeatherData weather;
     private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
-
+    private Menu favoritesMenu;
+    private MenuBar menuBar;
+    private Text secondWindowInfoText;
+    private TextField cityTextField;
+    
     @Override
     public void start(Stage stage) throws IOException {
         // get the weather
@@ -224,11 +234,11 @@ private void openSearchWindow() {
         // Top section: TextField and Button
         VBox topSection = new VBox(10);
         topSection.setAlignment(Pos.CENTER); // Center align the entire top section
-       
-        Text infoText = new Text(""); // Info text field
-        infoText.setFill(Color.RED); // Set text color to red
         
-        TextField cityTextField = new TextField();
+        secondWindowInfoText = new Text("");
+        secondWindowInfoText.setFill(Color.RED); // Set text color to red
+        
+        cityTextField = new TextField();
         cityTextField.setPromptText("Enter city name");
         cityTextField.setMaxWidth(200);
 
@@ -244,18 +254,32 @@ private void openSearchWindow() {
         addToFavoritesButton.setOnAction(e -> {
             String cityName = cityTextField.getText();
             if (cityName.isEmpty()) {
-                infoText.setText("Please type a city name.");
+                secondWindowInfoText.setText("Please type a city name.");
             } else {
                 addToFavorites(cityName);
-                infoText.setText("Favorite successfully saved!");
-                searchStage.close();
+                secondWindowInfoText.setText("Favorite successfully saved!");
             }
         });
-
+        
+                // Create an HBox for buttons
         HBox buttonLayout = new HBox(10, searchButton, addToFavoritesButton);
         buttonLayout.setAlignment(Pos.CENTER); // Center align the buttons within the HBox
+
         
-        topSection.getChildren().addAll(infoText, cityTextField, buttonLayout);
+        // Initialize MenuBar and Menu for favorites
+        favoritesMenu = new Menu("Favorites");
+        menuBar = new MenuBar();
+        menuBar.getMenus().add(favoritesMenu);
+        
+        // Load favorites into ComboBox
+        loadFavorites();  
+
+        // Wrap the MenuBar in an HBox for better alignment and sizing
+        HBox menuBarContainer = new HBox(menuBar);
+        menuBarContainer.setAlignment(Pos.CENTER); // Center the MenuBar within the HBox
+        menuBar.setMaxWidth(80); // Set preferred width to make the MenuBar smaller
+
+        topSection.getChildren().addAll(secondWindowInfoText, cityTextField, buttonLayout, menuBar);
       
         // Main layout
         VBox mainLayout = new VBox(30);
@@ -274,6 +298,51 @@ private void openSearchWindow() {
     // Optional: If you need to reset or update any components when the window is opened, do it here.
     // For example, you might want to clear the text field or update a list.
 }
+
+    private void loadFavorites() {
+        try {
+            List<String> favorites = Files.readAllLines(Paths.get("favorites"));
+            favoritesMenu.getItems().clear(); // Clear existing items
+            for (String city : favorites) {
+                MenuItem menuItem = new MenuItem(city);
+                menuItem.setOnAction(e -> cityTextField.setText(city)); // Set text field on menu item selection
+                favoritesMenu.getItems().add(menuItem);
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle exception
+        }
+    }
+
+
+private void addToFavorites(String cityName) {
+    try {
+        Path filePath = Paths.get("favorites");
+        if (!Files.exists(filePath)) {
+            Files.createFile(filePath);
+        }
+
+        // Read all lines from the file and trim each line
+        List<String> favorites = Files.readAllLines(filePath).stream()
+                                       .map(String::trim) // Remove leading and trailing whitespace
+                                       .map(String::toLowerCase) // Convert to lower case for case-insensitive comparison
+                                       .collect(Collectors.toList());
+
+        // Process the input city name similarly
+        String processedCityName = cityName.trim().toLowerCase();
+
+        if (!favorites.contains(processedCityName)) {
+            Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
+            loadFavorites(); // Reload favorites to include the new city
+            secondWindowInfoText.setText("Favorite successfully saved!");
+        } else {
+            secondWindowInfoText.setText("City is already a favorite.");
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace(); // Handle the exception
+    }
+}
+
+
     
 private void performSearch(String cityName) {
     weatherApiImpl weatherApi = new weatherApiImpl();
@@ -287,18 +356,6 @@ private void performSearch(String cityName) {
     } catch (IOException e) {
     }
 }
-
-    private void addToFavorites(String cityName) {
-        try {
-            Path filePath = Path.of("favorites");
-            if (!Files.exists(filePath)) {
-                Files.createFile(filePath);
-            }
-            Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
-        } catch (IOException ex) {
-            // Handle the exception as per your requirement
-        }
-    }
 
     public static void main(String[] args) {
         launch();
