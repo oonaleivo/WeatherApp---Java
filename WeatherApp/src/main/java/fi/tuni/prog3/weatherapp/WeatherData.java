@@ -15,8 +15,9 @@ public class WeatherData {
     //private final Double rain;
     private final double wind;
     private final String description;
+    private final int weatherCode;
 
-    public WeatherData(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double wind, String description) {
+    public WeatherData(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double wind, String description, int weatherCode) {
         this.currentTemp = currentTemp;
         this.tempMin = tempMin;
         this.tempMax = tempMax;
@@ -27,6 +28,7 @@ public class WeatherData {
         //this.rain = (rain != null) ? rain : 0.0; // Set rain to 0 if it's null
         this.wind = wind;
         this.description = description;
+        this.weatherCode = weatherCode;
     }
 
     // Getters for each field
@@ -64,5 +66,9 @@ public class WeatherData {
     
     public String getdescription() {
         return description;
+    }
+    
+    public int getWeatherCode() {
+        return weatherCode;
     }
 }

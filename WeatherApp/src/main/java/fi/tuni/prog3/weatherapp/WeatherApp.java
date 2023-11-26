@@ -1,7 +1,9 @@
 package fi.tuni.prog3.weatherapp;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -75,18 +77,18 @@ public class WeatherApp extends Application {
         return menuSection;
     }
     
-        private GridPane createCurrentSection() {
+    private GridPane createCurrentSection() {
         locationLabel = new Label();
         tempLabel = new Label();
         feelsLikeLabel = new Label();
         rainLabel = new Label();
         windLabel = new Label();
         humLabel = new Label();
-
+ 
         GridPane currentSection = new GridPane();
         currentSection.setHgap(10);
         currentSection.setVgap(10);
-
+ 
         currentSection.add(new Label("Tämän hetken sää"), 0, 0, 2, 1);
         currentSection.add(locationLabel, 0, 1);
         currentSection.add(tempLabel, 1, 2);
@@ -94,13 +96,13 @@ public class WeatherApp extends Application {
         currentSection.add(rainLabel, 0, 4);
         currentSection.add(windLabel, 1, 4);
         currentSection.add(humLabel, 2, 4);
-
+ 
         currentSection.setStyle("-fx-background-color: lightblue;");
         currentSection.setPrefHeight(220);
         currentSection.setAlignment(Pos.CENTER);
-
+ 
         updateCurrentWeatherSection();
-
+ 
         return currentSection;
     }
         
@@ -143,6 +145,48 @@ public class WeatherApp extends Application {
         dailySection.setPrefHeight(220);
 
         return dailySection;
+    }
+       
+    private ImageView getIcon() {
+       int weatherCode = weather.getWeatherCode();
+       
+       List<Integer> thunderstorm = new ArrayList<>(Arrays.asList(200, 201, 202, 210, 211, 212, 221, 230, 231, 232));
+       List<Integer> drizzle = new ArrayList<>(Arrays.asList(300, 301, 302, 310, 311, 312, 313, 314, 321));
+       List<Integer> rain = new ArrayList<>(Arrays.asList(500, 501, 502, 503, 504, 511, 520, 521, 522, 531));
+       List<Integer> snow = new ArrayList<>(Arrays.asList(600, 601, 602, 611, 612, 613, 615, 616, 620, 621, 622));
+       List<Integer> atmosphere = new ArrayList<>(Arrays.asList(701, 711, 721, 731, 741, 751, 761, 762, 771, 781));
+       List<Integer> clouds = new ArrayList<>(Arrays.asList(801, 802, 803, 804));
+       
+       // clear sky by defalt 
+       Image icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\sun.png");
+
+       if (thunderstorm.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\storm.png");
+       }
+       else if (drizzle.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\drizzle.png");
+       }
+       else if (rain.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\rain.png");
+       }
+       else if (snow.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\snowy.png");
+       }
+       else if (atmosphere.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
+       }
+       else if (atmosphere.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
+       }
+       else if (clouds.contains(weatherCode)) {
+           icon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\cloud.png");
+       }
+              
+        ImageView imageView = new ImageView(icon);
+        imageView.setFitWidth(100); 
+        imageView.setFitHeight(100); 
+        
+        return imageView;
     }
     
     private Button getQuitButton() {
