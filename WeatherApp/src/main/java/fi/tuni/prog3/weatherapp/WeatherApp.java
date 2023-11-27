@@ -1,5 +1,6 @@
 package fi.tuni.prog3.weatherapp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,8 +153,6 @@ public class WeatherApp extends Application {
             windLabel.setText(String.format("wind: %.1f", weather.getWind()));
             humLabel.setText(String.format("humidity: %d", weather.getHumidity()));
             icon.setImage(getIcon().getImage());
-
-            System.out.println(weather.getWeatherCode());
         }
     }
     
@@ -187,9 +186,7 @@ public class WeatherApp extends Application {
        
     private ImageView getIcon() {
        int weatherCode = weather.getWeatherCode();
-       
-       System.out.println(weather.getWeatherCode());
-       
+          
        List<Integer> thunderstorm = new ArrayList<>(Arrays.asList(200, 201, 202, 210, 211, 212, 221, 230, 231, 232));
        List<Integer> drizzle = new ArrayList<>(Arrays.asList(300, 301, 302, 310, 311, 312, 313, 314, 321));
        List<Integer> rain = new ArrayList<>(Arrays.asList(500, 501, 502, 503, 504, 511, 520, 521, 522, 531));
@@ -197,30 +194,29 @@ public class WeatherApp extends Application {
        List<Integer> atmosphere = new ArrayList<>(Arrays.asList(701, 711, 721, 731, 741, 751, 761, 762, 771, 781));
        List<Integer> clouds = new ArrayList<>(Arrays.asList(801, 802, 803, 804));
        
-       System.out.println(weatherCode);
        // clear sky by defalt 
-       Image weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\sun.png");
+       Image weatherIcon = new Image(new File("icons/sun.png").toURI().toString());
 
        if (thunderstorm.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\storm.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\storm.png");
        }
        else if (drizzle.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\drizzle.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\drizzle.png");
        }
        else if (rain.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\rain.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\rain.png");
        }
        else if (snow.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\snowy.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\snowy.png");
        }
        else if (atmosphere.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\mist.png");
        }
        else if (atmosphere.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\mist.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\mist.png");
        }
        else if (clouds.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\reett\\ohj3projekti\\group3206\\WeatherApp\\icons\\cloud.png");
+           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\cloud.png");
        }
               
         ImageView imageView = new ImageView(weatherIcon);
@@ -297,7 +293,7 @@ public class WeatherApp extends Application {
         menuBar = new MenuBar();
         menuBar.getMenus().add(favoritesMenu);
         
-        // Load favorites into ComboBox
+        // Load favorites
         loadFavorites();  
 
         // Wrap the MenuBar in an HBox for better alignment and sizing
@@ -320,9 +316,6 @@ public class WeatherApp extends Application {
     }
     // Show the stage without re-creating the UI components
     searchStage.show();
-
-    // Optional: If you need to reset or update any components when the window is opened, do it here.
-    // For example, you might want to clear the text field or update a list.
 }
 
     private void loadFavorites() {
@@ -339,35 +332,33 @@ public class WeatherApp extends Application {
         }
     }
     
-    private void addToFavorites(String cityName) {
-        try {
-            Path filePath = Paths.get("favorites");
-            if (!Files.exists(filePath)) {
-                Files.createFile(filePath);
-            }
-
-            // Read all lines from the file and trim each line
-            List<String> favorites = Files.readAllLines(filePath).stream()
-                                           .map(String::trim) // Remove leading and trailing whitespace
-                                           .map(String::toLowerCase) // Convert to lower case for case-insensitive comparison
-                                           .collect(Collectors.toList());
-
-            // Process the input city name similarly
-            String processedCityName = cityName.trim().toLowerCase();
-
-            if (!favorites.contains(processedCityName)) {
-                Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
-                loadFavorites(); // Reload favorites to include the new city
-                secondWindowInfoText.setText("Favorite successfully saved!");
-            } else {
-                secondWindowInfoText.setText("City is already a favorite.");
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace(); // Handle the exception
+private void addToFavorites(String cityName) {
+    try {
+        Path filePath = Paths.get("favorites");
+        if (!Files.exists(filePath)) {
+            Files.createFile(filePath);
         }
+
+        String standardizedCityName = cityName.trim().toLowerCase();
+        List<String> favorites = Files.readAllLines(filePath);
+
+        List<String> standardizedFavorites = favorites.stream()
+                                                      .map(String::trim)
+                                                      .map(String::toLowerCase)
+                                                      .collect(Collectors.toList());
+
+        if (!standardizedFavorites.contains(standardizedCityName)) {
+            Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
+            loadFavorites();
+            Platform.runLater(() -> secondWindowInfoText.setText("Favorite successfully saved!"));
+        } else {
+            Platform.runLater(() -> secondWindowInfoText.setText("City is already a favorite."));
+        }
+    } catch (IOException ex) {
+        ex.printStackTrace();
+        Platform.runLater(() -> secondWindowInfoText.setText("Error: " + ex.getMessage()));
     }
-
-
+}
 
     private void performSearch(String cityName) {
         weatherApiImpl weatherApi = new weatherApiImpl();

@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 // yhdistä toistuva koodi yhdeksi funktioksi?
 
 public class weatherApiImpl implements iAPI {
-    private final String apiKey = "b201aa400ba5bdc211c7bbf93e38162f";
+    private final String apiKey = "b201aa400ba5bdc211c7bbf93e38162f"; 
 
     @Override
     public String lookUpLocation(String loc) {
@@ -104,7 +104,7 @@ public class weatherApiImpl implements iAPI {
     public String getHourlyForecast(double lat, double lon) {
         String hourlyJsonData = "";
         // Build the API URL
-        String apiUrl = String.format("https://api.openweathermap.org/data/2.5/forecast/hourly?lat=%f&lon=%f&appid=%s&units=%s",
+        String apiUrl = String.format("https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=%f&lon=%f&appid=%s&units=%s",
                 lat, lon, apiKey, "metric");
 
         // Create an HttpClient
