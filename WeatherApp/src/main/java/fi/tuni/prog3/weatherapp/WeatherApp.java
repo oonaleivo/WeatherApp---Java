@@ -39,6 +39,15 @@ import javafx.stage.Stage;
 //git commit
 //git push
 
+/* Kooditorio muutokset:
+
+Image weatherIcon = new Image(new File("icons/sun.png").toURI().toString());
+
+Lue kaikki tiedostot jostain kansiosta: (ei tarvis yks kerrallaan)
+https://stackoverflow.com/questions/1844688/how-to-read-all-files-in-a-folder-from-java
+
+https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa localdate + localdatetime 
+luokilla saa muutettua päiviksi. */
 
 
 // koodeja pitää jaotella useampiin ryhmiin
@@ -103,7 +112,7 @@ public class WeatherApp extends Application {
         HBox menuSection = new HBox(10);
         menuSection.setPadding(new Insets(10));
         menuSection.getChildren().addAll(search, quit);
-        menuSection.setStyle("-fx-background-color: lightgray;");
+        menuSection.setStyle("-fx-background-color: lightyellow;");
         menuSection.setPrefHeight(40);
 
         return menuSection;
@@ -132,14 +141,14 @@ public class WeatherApp extends Application {
         currentInfo.add(windLabel, 1, 3);
         currentInfo.add(humLabel, 2, 3);
  
-        currentInfo.setStyle("-fx-background-color: lightgray;");
+        currentInfo.setStyle("-fx-background-color: white;");
         currentInfo.setPrefHeight(300);
         currentInfo.setAlignment(Pos.CENTER);
         
         HBox currentSection = new HBox(30); 
         currentSection.setPadding(new Insets(10));
         currentSection.getChildren().addAll(icon, currentInfo);
-        currentSection.setStyle("-fx-background-color: lightgray;");
+        currentSection.setStyle("-fx-background-color: white;");
         currentSection.setPrefHeight(300);
         currentSection.setAlignment(Pos.CENTER);
  
@@ -168,7 +177,7 @@ public class WeatherApp extends Application {
         hourlySection.getChildren().addAll(footerLabel);
 
         // Set style
-        hourlySection.setStyle("-fx-background-color: lightgray;");
+        hourlySection.setStyle("-fx-background-color: lightyellow;");
         hourlySection.setPrefHeight(180);
 
         return hourlySection;
@@ -182,7 +191,7 @@ public class WeatherApp extends Application {
         dailySection.getChildren().addAll(titleLabel);
 
         // Set style
-        dailySection.setStyle("-fx-background-color: lightgrey;");
+        dailySection.setStyle("-fx-background-color: white;");
         dailySection.setPrefHeight(180);
 
         return dailySection;
@@ -212,38 +221,79 @@ public class WeatherApp extends Application {
     private ImageView getIcon() {
        int weatherCode = weather.getWeatherCode();
           
-       List<Integer> thunderstorm = new ArrayList<>(Arrays.asList(200, 201, 202, 210, 211, 212, 221, 230, 231, 232));
-       List<Integer> drizzle = new ArrayList<>(Arrays.asList(300, 301, 302, 310, 311, 312, 313, 314, 321));
-       List<Integer> rain = new ArrayList<>(Arrays.asList(500, 501, 502, 503, 504, 511, 520, 521, 522, 531));
-       List<Integer> snow = new ArrayList<>(Arrays.asList(600, 601, 602, 611, 612, 613, 615, 616, 620, 621, 622));
-       List<Integer> atmosphere = new ArrayList<>(Arrays.asList(701, 711, 721, 731, 741, 751, 761, 762, 771, 781));
-       List<Integer> clouds = new ArrayList<>(Arrays.asList(801, 802, 803, 804));
+       List<Integer> lightrainthunderstorm = new ArrayList<>(Arrays.asList(200,230,231));
+       List<Integer> heavythunderstorm = new ArrayList<>(Arrays.asList( 201, 202, 211, 212, 221, 232));
+       List<Integer> lightthunderstorm = new ArrayList<>(Arrays.asList(210));
+       List<Integer> drizzle = new ArrayList<>(Arrays.asList(300, 301, 302, 310, 311, 313, 321));
+       List<Integer> lightrain = new ArrayList<>(Arrays.asList(500));
+       List<Integer> rain = new ArrayList<>(Arrays.asList( 312, 314, 501, 520, 521));
+       List<Integer> heavyrain = new ArrayList<>(Arrays.asList(502, 503, 504, 522, 531));
+       List<Integer> heavysnow = new ArrayList<>(Arrays.asList( 602, 621, 622));
+       List<Integer> lightsnow = new ArrayList<>(Arrays.asList(600, 601, 620));
+       List<Integer> sleet = new ArrayList<>(Arrays.asList(611, 612, 613, 615, 616));
+       List<Integer> atmosphere = new ArrayList<>(Arrays.asList( 711, 721, 771));
+       List<Integer> clouds = new ArrayList<>(Arrays.asList(804));
+       List<Integer> partlycloudy = new ArrayList<>(Arrays.asList( 802, 803));
+       List<Integer> mostlysunny = new ArrayList<>(Arrays.asList(801));
+       List<Integer> mistandfog = new ArrayList<>(Arrays.asList(701, 741));
+       List<Integer> tornado = new ArrayList<>(Arrays.asList(781));
+       List<Integer> duststorm = new ArrayList<>(Arrays.asList(731, 751, 761, 762));
        
        // clear sky by defalt 
        Image weatherIcon = new Image(new File("icons/sun.png").toURI().toString());
 
-       if (thunderstorm.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\storm.png");
+       if (lightrainthunderstorm.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/storm-light-rain.png").toURI().toString());
+       }
+       else if (heavythunderstorm.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/storm-with-heavy-rain.png").toURI().toString());
+       }
+       else if (lightthunderstorm.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/storm-light.png").toURI().toString());
        }
        else if (drizzle.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\drizzle.png");
+           weatherIcon = new Image(new File("icons/drizzle.png").toURI().toString());
+       }
+       else if (lightrain.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/light-rain.png").toURI().toString());
        }
        else if (rain.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\rain.png");
+           weatherIcon = new Image(new File("icons/rain.png").toURI().toString());
        }
-       else if (snow.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\snowy.png");
+       else if (heavyrain.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/heavy-rain.png").toURI().toString());
+       }
+       else if (heavysnow.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/snowy.png").toURI().toString());
+       }
+       else if (lightsnow.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/light-snow.png").toURI().toString());
+       }
+       else if (sleet.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/sleet.png").toURI().toString());
        }
        else if (atmosphere.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\mist.png");
-       }
-       else if (atmosphere.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\mist.png");
+           weatherIcon = new Image(new File("icons/smoke.png").toURI().toString());
        }
        else if (clouds.contains(weatherCode)) {
-           weatherIcon = new Image("C:\\Users\\oonam\\Prg Ohj3\\group3206\\WeatherApp\\icons\\cloud.png");
+           weatherIcon = new Image(new File("icons/cloud.png").toURI().toString());
        }
-              
+       else if (partlycloudy.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/partly-cloudy.png").toURI().toString());
+       }
+       else if (mostlysunny.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/mostlysunny.png").toURI().toString());
+       }
+       else if (mistandfog.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/mist.png").toURI().toString());
+       }
+       else if (tornado.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/hurricane.png").toURI().toString());
+       }
+       else if (duststorm.contains(weatherCode)) {
+           weatherIcon = new Image(new File("icons/dust-storm.png").toURI().toString());
+       }
+       
         ImageView imageView = new ImageView(weatherIcon);
         imageView.setFitWidth(200); 
         imageView.setFitHeight(200); 
@@ -290,7 +340,7 @@ public class WeatherApp extends Application {
         cityTextField.setMaxWidth(200);
 
         Button searchButton = new Button("Search");
-        searchButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
+        searchButton.setStyle("-fx-background-color: lightblue; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
         searchButton.setOnAction(e -> {
             String cityName = cityTextField.getText().trim(); // Trim to remove leading and trailing whitespace
             if (!cityName.isEmpty()) {
@@ -305,7 +355,7 @@ public class WeatherApp extends Application {
         });
         
         Button addToFavoritesButton = new Button("Add to Favorites");
-        addToFavoritesButton.setStyle("-fx-background-color: #FFC0CB; -fx-border-color: #8B008B; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
+        addToFavoritesButton.setStyle("-fx-background-color: lightblue; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
         addToFavoritesButton.setOnAction(e -> {
             String cityName = cityTextField.getText();
             if (cityName.isEmpty()) {
@@ -339,7 +389,7 @@ public class WeatherApp extends Application {
         // Main layout
         VBox mainLayout = new VBox(30);
         mainLayout.getChildren().add(topSection);
-        mainLayout.setStyle("-fx-background-color: lightgray; -fx-padding: 10;");
+        mainLayout.setStyle("-fx-background-color: white; -fx-padding: 10;");
 
         Scene scene = new Scene(mainLayout, 300, 300);
         searchStage.setScene(scene);
