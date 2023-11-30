@@ -54,7 +54,7 @@ public class weatherApiImpl implements iAPI {
                 System.out.println("Failed to get location information. Status code: " + response.statusCode());
             }
         } catch (Exception e) {
-            System.err.println("Error making the API call: " + e.getMessage());
+            System.err.println("Error making the location API call: " + e.getMessage());
         }
         getCurrentWeather(latitude, longitude);
         getHourlyForecast(latitude, longitude);
@@ -86,16 +86,17 @@ public class weatherApiImpl implements iAPI {
                 currentJsonData = response.body();
                 
                 //lisää tähän fileen tallennus
-                System.out.println(currentJsonData);
+                System.out.println("current: " + currentJsonData);
                 ReadFile file = new ReadFile();
                 file.setDataToWrite(currentJsonData);
-                file.writeToFile("weatherData");
+                file.writeToFile("currentWeatherData");
 
             } else {
                 System.out.println("Failed to get daily weather information. Status code: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) {
-            System.err.println("Error making the API call: " + e.getMessage());
+            System.err.println("Error making the current weather API call: " + e.getMessage());
+            e.printStackTrace();
         }
         return currentJsonData;
     }
@@ -124,7 +125,7 @@ public class weatherApiImpl implements iAPI {
                 hourlyJsonData = response.body();
 
                 // Add file writing here
-                System.out.println(hourlyJsonData);
+                System.out.println("Hourly: " + hourlyJsonData);
                 ReadFile file = new ReadFile();
                 file.setDataToWrite(hourlyJsonData);
                 file.writeToFile("hourlyWeatherData");
@@ -133,7 +134,7 @@ public class weatherApiImpl implements iAPI {
                 System.out.println("Failed to get hourly forecast information. Status code: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) {
-            System.err.println("Error making the API call: " + e.getMessage());
+            System.err.println("Error making the hourly weather API call: " + e.getMessage());
         }
         return hourlyJsonData;
 }
@@ -163,7 +164,7 @@ public class weatherApiImpl implements iAPI {
                 dailyJsonData = response.body();
                 
                 //lisää tähän fileen tallennus
-                System.out.println(dailyJsonData);
+                System.out.println("Daily: " + dailyJsonData);
                 ReadFile file = new ReadFile();
                 file.setDataToWrite(dailyJsonData);
                 file.writeToFile("dailyWeatherData");
@@ -172,7 +173,7 @@ public class weatherApiImpl implements iAPI {
                 System.out.println("Failed to get weather information. Status code: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) {
-            System.err.println("Error making the API call: " + e.getMessage());
+            System.err.println("Error making the daily weather API call: " + e.getMessage());
         }
         return dailyJsonData;
     }

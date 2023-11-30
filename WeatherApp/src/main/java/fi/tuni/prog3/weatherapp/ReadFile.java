@@ -7,9 +7,14 @@ package fi.tuni.prog3.weatherapp;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  *
@@ -18,24 +23,35 @@ import java.nio.file.StandardOpenOption;
 public class ReadFile implements iReadAndWriteToFile {
 
     private String dataToWrite;
-    private String readData;
+    private String currentData;
+    private String hourlyData;
+    private String dailyData;
 
     public void setDataToWrite(String data) {
         this.dataToWrite = data;
     }
 
+    //miksi palauttaa boolean. käytetäänkö me sitä missään?
     @Override
-    public boolean readFromFile(String fileName) throws IOException {
-        Path filePath = Path.of(fileName);
-        readData = Files.readString(filePath);
-        
-        return true;
-        
-        //muuten palauta false
+    public boolean readFromFile(String folderName) throws IOException {
+        Path folderPath = Paths.get(folderName);
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(folderPath)) {
+            for (Path file : stream) {
+                String fileContent = Files.readString(file);
+                if (file.getFileName().toString().equals("currentWeatherData")) {
+                    currentData = fileContent;
+                } else if (file.getFileName().toString().equals("hourlyWeatherData")) {
+                    hourlyData = fileContent;
+                } else {
+                    dailyData = fileContent;
+                }
+            }
+            return true;
+        }
     }
     
     public WeatherData getWeather() {
-        JsonObject jsonObject = JsonParser.parseString(readData).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(currentData).getAsJsonObject();
         
         // Extracting required data, minus 273.15 to convert kelvin to celcius
         double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
@@ -55,11 +71,17 @@ public class ReadFile implements iReadAndWriteToFile {
         return weatherData;
     }
     
+    public LocalDateTime convertTimestampToDate(long timestamp) {
+        Instant instant = Instant.ofEpochSecond(timestamp);
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
+    
     public void getHourlyWeather() {
         
     }
     
     public void getDailyWeather() {
+        JsonObject jsonObject = JsonParser.parseString(dailyData).getAsJsonObject();
         //DailyWeatherData(int date, double maxTemp, double minTemp, String description)
     }
 
@@ -68,8 +90,21 @@ public class ReadFile implements iReadAndWriteToFile {
         if (dataToWrite == null) {
             throw new IllegalStateException("No data set to write.");
         }
-        Path filePath = Path.of(fileName);
-        Files.writeString(filePath, dataToWrite, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        return true;
+
+        // Specify the folder name
+        String folderName = "weatherData";
+
+        // Combine the folder name and file name to get the full path
+        Path filePath = Paths.get(folderName, fileName);
+
+        try {
+            Files.createDirectories(filePath.getParent());  // Ensure the folder exists
+            Files.writeString(filePath, dataToWrite, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+            return false;
+        }
     }
+
 }
