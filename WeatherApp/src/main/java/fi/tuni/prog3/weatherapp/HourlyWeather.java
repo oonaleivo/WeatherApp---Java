@@ -10,10 +10,10 @@ package fi.tuni.prog3.weatherapp;
  */
 public class HourlyWeather {
     private final String time;
-    private final double temp;
+    private final String temp;
     private final int weatherCode;
 
-    public HourlyWeather(String time, double temp, int weatherCode) {
+    public HourlyWeather(String time, String temp, int weatherCode) {
         this.time = time;
         this.temp = temp;
         this.weatherCode = weatherCode;
@@ -23,7 +23,7 @@ public class HourlyWeather {
         return time;
     }
 
-    public double getTemp() {
+    public String getTemp() {
         return temp;
     }
 

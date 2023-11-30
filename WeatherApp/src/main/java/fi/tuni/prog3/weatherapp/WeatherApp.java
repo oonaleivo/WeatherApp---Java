@@ -51,15 +51,15 @@ luokilla saa muutettua päiviksi. */
 
 
 // päiväkohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia
-// tuntikohtainen ennuste sectio pitää tehdä
+// tuntikohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia
+// tuntiennuste ei mahdu ruudulle, lisätäänkö scrolleri?
+// current temp meni pieneksi, en pysty muuttamaan fonttikokoa??
 // pitää asettaa rain 0 jos null
-// kuvat rain, wind, humidity ?
+// rain wind humidity pitää lisätä yksiköt (ja kuvat)
+// onko selkeempi jos päiväennusteessa lukee min ja max omilla riveillä eikä ...
+// lopuksi tehään nätin näköseksi + nyt ei kauheesti "selkeää omaleimaisuutta annettuun pohjaan verrattuna"
 // yksikkötestit
 
-// Kysy kooditoriossa:
-// tuntikohtaisen ennusteen hakeminen ei toimi
-// kuvien tiedostopolku
-// missä päiväkohtasessa ennusteessa lukee, että minkä päivän ennuste se on
 
 public class WeatherApp extends Application {
     private CurrentWeather currentWeather;
@@ -124,7 +124,7 @@ public class WeatherApp extends Application {
         locationLabel = new Label();
         locationLabel.setStyle("-fx-font: 30 Calibri;");
         tempLabel = new Label();
-        tempLabel.setStyle("-fx-font: 40 Calibri;");
+        tempLabel.setStyle("-fx-font: 50 Calibri;");
         feelsLikeLabel = new Label();
         rainLabel = new Label();
         windLabel = new Label();
@@ -172,11 +172,24 @@ public class WeatherApp extends Application {
     }
     
     private HBox createHourlySection() {
-        // Add elements
-        Label footerLabel = new Label("tunti ennuste");
+        // Create Hbox to be the main structure
         HBox hourlySection = new HBox(10);
         hourlySection.setPadding(new Insets(10));
-        hourlySection.getChildren().addAll(footerLabel);
+        
+        // Create a VBox for each hour with hourly data and add them to the HBox
+        for (HourlyWeather data : hourlyWeatherList){
+            VBox hour = new VBox(10);
+            Label timeLabel = new Label(data.getTime());
+            timeLabel.setStyle("-fx-font: 14 Calibri;");
+            ImageView hourlyIcon = getIcon(data.getWeatherCode());
+            hourlyIcon.setFitWidth(30);
+            hourlyIcon.setFitHeight(30);
+            Label hourlyTempLabel = new Label(data.getTemp());
+            tempLabel.setStyle("-fx-font: 14 Calibri;");
+            hour.getChildren().addAll(timeLabel, hourlyIcon, hourlyTempLabel);
+            hour.setAlignment(Pos.CENTER);
+            hourlySection.getChildren().add(hour);
+        }
 
         // Set style
         hourlySection.setStyle("-fx-background-color: lightyellow;");

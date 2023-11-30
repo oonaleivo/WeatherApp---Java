@@ -95,7 +95,8 @@ public class ReadFile implements iReadAndWriteToFile {
             LocalDateTime time = convertTimestampToDate(timestamp);
             String formattedTime = time.format(formatter);
 
-            double temp = hourlyObject.getAsJsonObject("main").get("temp").getAsDouble();
+            double tempAsDouble = hourlyObject.getAsJsonObject("main").get("temp").getAsDouble();
+            String temp = String.format("%.1f ℃", tempAsDouble);
             int weatherCode = hourlyObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("id").getAsInt();
 
             HourlyWeather hourlyWeather = new HourlyWeather(formattedTime, temp, weatherCode);
