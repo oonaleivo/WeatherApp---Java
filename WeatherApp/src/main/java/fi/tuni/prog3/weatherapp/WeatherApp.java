@@ -21,7 +21,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -52,7 +54,6 @@ luokilla saa muutettua päiviksi. */
 
 // päiväkohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia
 // tuntikohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia
-// tuntiennuste ei mahdu ruudulle, lisätäänkö scrolleri?
 // current temp meni pieneksi, en pysty muuttamaan fonttikokoa??
 // pitää asettaa rain 0 jos null
 // rain wind humidity pitää lisätä yksiköt (ja kuvat)
@@ -93,11 +94,17 @@ public class WeatherApp extends Application {
         HBox currentSection = createCurrentSection();
         HBox hourlySection = createHourlySection();
         HBox dailySection = createDailySection();
+        
+        // Create a horizontal scrollbar that is always shown for hourlySection
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(hourlySection);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); 
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         // Create a VBox to hold the sections
         VBox root = new VBox(10); // 10 is the spacing between sections
         root.setPadding(new Insets(10));
-        root.getChildren().addAll(menuSection, currentSection, hourlySection, dailySection);
+        root.getChildren().addAll(menuSection, currentSection, hourlySection,scrollPane, dailySection);
 
         // Create the scene
         Scene scene = new Scene(root, 600, 750);
@@ -180,18 +187,20 @@ public class WeatherApp extends Application {
         for (HourlyWeather data : hourlyWeatherList){
             VBox hour = new VBox(10);
             Label timeLabel = new Label(data.getTime());
-            timeLabel.setStyle("-fx-font: 14 Calibri;");
+            timeLabel.setStyle("-fx-font: 18 Calibri;");
             ImageView hourlyIcon = getIcon(data.getWeatherCode());
-            hourlyIcon.setFitWidth(30);
-            hourlyIcon.setFitHeight(30);
+            hourlyIcon.setFitWidth(40);
+            hourlyIcon.setFitHeight(40);
             Label hourlyTempLabel = new Label(data.getTemp());
-            tempLabel.setStyle("-fx-font: 14 Calibri;");
+            hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
+            tempLabel.setStyle("-fx-font: 18 Calibri;");
             hour.getChildren().addAll(timeLabel, hourlyIcon, hourlyTempLabel);
             hour.setAlignment(Pos.CENTER);
             hourlySection.getChildren().add(hour);
         }
 
         // Set style
+        hourlySection.setPrefWidth(50*24); // Calculate the width based on the content
         hourlySection.setStyle("-fx-background-color: lightyellow;");
         hourlySection.setPrefHeight(180);
 
