@@ -102,12 +102,13 @@ public class ReadFile implements iReadAndWriteToFile {
             JsonObject tempObject = dailyObject.getAsJsonObject("temp");
             double maxTemp = tempObject.getAsJsonPrimitive("max").getAsDouble();
             double minTemp = tempObject.getAsJsonPrimitive("min").getAsDouble();
+            String formattedTemps = String.format("%.1f℃ ... %.1f℃", minTemp, maxTemp);
             
             JsonObject weatherObject = dailyObject.getAsJsonArray("weather").get(0).getAsJsonObject();
             String description = weatherObject.get("description").getAsString();
             int weatherCode = weatherObject.get("id").getAsInt();
 
-            DailyWeatherData dailyWeatherData = new DailyWeatherData(formattedDate, maxTemp, minTemp, description, weatherCode);
+            DailyWeatherData dailyWeatherData = new DailyWeatherData(formattedDate, formattedTemps, description, weatherCode);
             dailyWeatherList.add(dailyWeatherData);
         }
         return dailyWeatherList;  

@@ -50,7 +50,7 @@ https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa loc
 luokilla saa muutettua päiviksi. */
 
 
-// päiväkohtainen ennuste sectio pitää tehdä
+// päiväkohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia
 // tuntikohtainen ennuste sectio pitää tehdä
 // pitää asettaa rain 0 jos null
 // kuvat rain, wind, humidity ?
@@ -127,7 +127,7 @@ public class WeatherApp extends Application {
         rainLabel = new Label();
         windLabel = new Label();
         humLabel = new Label();
-        icon = getIcon();
+        icon = getIcon(currentWeather.getWeatherCode());
         
         GridPane currentInfo = new GridPane();
         currentInfo.setHgap(10);
@@ -165,7 +165,7 @@ public class WeatherApp extends Application {
             rainLabel.setText("rain");
             windLabel.setText(String.format("wind: %.1f", currentWeather.getWind()));
             humLabel.setText(String.format("humidity: %d", currentWeather.getHumidity()));
-            icon.setImage(getIcon().getImage());
+            icon.setImage(getIcon(currentWeather.getWeatherCode()).getImage());
         }
     }
     
@@ -184,15 +184,29 @@ public class WeatherApp extends Application {
     }
     
     private HBox createDailySection() {
-        // Add elements
-        Label titleLabel = new Label("Lähipäivien ennuste");
+        // Create Hbox to be the main structure
         HBox dailySection = new HBox(10);
         dailySection.setPadding(new Insets(10));
-        dailySection.getChildren().addAll(titleLabel);
+        
+        // Create a VBox for each day with daily data and add them to the HBox
+        for (DailyWeatherData data : dailyWeatherList){
+            VBox day = new VBox(10);
+            Label dateLabel = new Label(data.getDate());
+            dateLabel.setStyle("-fx-font: 18 Calibri;");
+            ImageView dailyIcon = getIcon(data.getWeatherCode());
+            dailyIcon.setFitWidth(60);
+            dailyIcon.setFitHeight(60);
+            Label minMaxLabel = new Label(data.getTemp());
+            minMaxLabel.setStyle("-fx-font: 14 Calibri;");
+            day.getChildren().addAll(dateLabel, dailyIcon, minMaxLabel);
+            day.setAlignment(Pos.CENTER);
+            dailySection.getChildren().add(day);
+        }
 
         // Set style
         dailySection.setStyle("-fx-background-color: white;");
         dailySection.setPrefHeight(180);
+        dailySection.setAlignment(Pos.CENTER);
 
         return dailySection;
     }
@@ -218,9 +232,7 @@ public class WeatherApp extends Application {
         return null;
     }
 
-    private ImageView getIcon() {
-       int weatherCode = currentWeather.getWeatherCode();
-          
+    private ImageView getIcon(int weatherCode) { 
        List<Integer> lightrainthunderstorm = new ArrayList<>(Arrays.asList(200,230,231));
        List<Integer> heavythunderstorm = new ArrayList<>(Arrays.asList( 201, 202, 211, 212, 221, 232));
        List<Integer> lightthunderstorm = new ArrayList<>(Arrays.asList(210));

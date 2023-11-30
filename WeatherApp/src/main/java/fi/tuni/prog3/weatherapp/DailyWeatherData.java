@@ -1,18 +1,14 @@
 package fi.tuni.prog3.weatherapp;
 
-import java.time.LocalDateTime;
-
 public class DailyWeatherData {
     private final String date;
-    private final double maxTemp;
-    private final double minTemp;
+    private final String temp;
     private final String description;
     private final int weatherCode;
 
-    public DailyWeatherData(String date, double maxTemp, double minTemp, String description, int weatherCode) {
+    public DailyWeatherData(String date, String temp, String description, int weatherCode) {
         this.date = date;
-        this.maxTemp = maxTemp;
-        this.minTemp = minTemp;
+        this.temp = temp;
         this.description = description;
         this.weatherCode = weatherCode;
     }
@@ -21,12 +17,8 @@ public class DailyWeatherData {
         return date;
     }
 
-    public double getMaxTemp() {
-        return maxTemp;
-    }
-
-    public double getMinTemp() {
-        return minTemp;
+    public String getTemp() {
+        return temp;
     }
 
     public String getDescription() {
