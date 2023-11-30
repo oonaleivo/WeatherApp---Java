@@ -62,8 +62,9 @@ luokilla saa muutettua päiviksi. */
 // missä päiväkohtasessa ennusteessa lukee, että minkä päivän ennuste se on
 
 public class WeatherApp extends Application {
-    private WeatherData currentWeather;
-    private ArrayList<DailyWeatherData> dailyWeatherList;
+    private CurrentWeather currentWeather;
+    private ArrayList<DailyWeather> dailyWeatherList;
+    private ArrayList<HourlyWeather> hourlyWeatherList;
     private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
     private ImageView icon;
 
@@ -85,6 +86,7 @@ public class WeatherApp extends Application {
         file.readFromFile("weatherData");
         currentWeather = file.getCurrentWeather();
         dailyWeatherList = file.getDailyWeather();
+        hourlyWeatherList = file.getHourlyWeather();
         
         // Create the main sections
         HBox menuSection = createMenuSection();
@@ -189,7 +191,7 @@ public class WeatherApp extends Application {
         dailySection.setPadding(new Insets(10));
         
         // Create a VBox for each day with daily data and add them to the HBox
-        for (DailyWeatherData data : dailyWeatherList){
+        for (DailyWeather data : dailyWeatherList){
             VBox day = new VBox(10);
             Label dateLabel = new Label(data.getDate());
             dateLabel.setStyle("-fx-font: 18 Calibri;");

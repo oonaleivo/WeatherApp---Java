@@ -27,9 +27,9 @@ import java.util.ArrayList;
 public class ReadFile implements iReadAndWriteToFile {
 
     private String dataToWrite;
-    private String currentData;
-    private String hourlyData;
-    private String dailyData;
+    private String currentJsonData;
+    private String hourlyJsonData;
+    private String dailyJsonData;
 
     public void setDataToWrite(String data) {
         this.dataToWrite = data;
@@ -43,21 +43,21 @@ public class ReadFile implements iReadAndWriteToFile {
             for (Path file : stream) {
                 String fileContent = Files.readString(file);
                 if (file.getFileName().toString().equals("currentWeatherData")) {
-                    currentData = fileContent;
+                    currentJsonData = fileContent;
                 } else if (file.getFileName().toString().equals("hourlyWeatherData")) {
-                    hourlyData = fileContent;
+                    hourlyJsonData = fileContent;
                 } else {
-                    dailyData = fileContent;
+                    dailyJsonData = fileContent;
                 }
             }
             return true;
         }
     }
     
-    public WeatherData getCurrentWeather() {
-        JsonObject jsonObject = JsonParser.parseString(currentData).getAsJsonObject();
+    public CurrentWeather getCurrentWeather() {
+        JsonObject jsonObject = JsonParser.parseString(currentJsonData).getAsJsonObject();
         
-        // Extracting required data, minus 273.15 to convert kelvin to celcius
+        // Extracting required data
         double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
         double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble();
         double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble();
@@ -70,7 +70,7 @@ public class ReadFile implements iReadAndWriteToFile {
         String description = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("description").getAsString();
         int weatherCode = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("id").getAsInt();
 
-        WeatherData weatherData = new WeatherData(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind, description, weatherCode);
+        CurrentWeather weatherData = new CurrentWeather(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind, description, weatherCode);
         
         return weatherData;
     }
@@ -80,18 +80,38 @@ public class ReadFile implements iReadAndWriteToFile {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
     
-    public void getHourlyWeather() {
+    public ArrayList<HourlyWeather> getHourlyWeather() {
+        ArrayList<HourlyWeather> hourlyWeatherList = new ArrayList<>();
         
+        JsonObject jsonObject = JsonParser.parseString(hourlyJsonData).getAsJsonObject();
+        JsonArray hourlyList = jsonObject.getAsJsonArray("list"); // list of hours
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH");
+        
+        // Create HourlyWeather object and save it to hourly WeatherList for each hour
+        for (JsonElement hourlyElement : hourlyList) {
+            JsonObject hourlyObject = hourlyElement.getAsJsonObject();
+
+            long timestamp = hourlyObject.getAsJsonPrimitive("dt").getAsLong();
+            LocalDateTime time = convertTimestampToDate(timestamp);
+            String formattedTime = time.format(formatter);
+
+            double temp = hourlyObject.getAsJsonObject("main").get("temp").getAsDouble();
+            int weatherCode = hourlyObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("id").getAsInt();
+
+            HourlyWeather hourlyWeather = new HourlyWeather(formattedTime, temp, weatherCode);
+            hourlyWeatherList.add(hourlyWeather);
+        }   
+        return hourlyWeatherList;
     }
     
-    public ArrayList<DailyWeatherData> getDailyWeather() {
-        ArrayList<DailyWeatherData> dailyWeatherList = new ArrayList<>();
+    public ArrayList<DailyWeather> getDailyWeather() {
+        ArrayList<DailyWeather> dailyWeatherList = new ArrayList<>();
         
-        JsonObject jsonObject = JsonParser.parseString(dailyData).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(dailyJsonData).getAsJsonObject();
         JsonArray dailyList = jsonObject.getAsJsonArray("list"); // list of days
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.");
 
-        // Create DailyWeatherData object and save to dailyWeatherList for each day
+        // Create DailyWeather object and save to dailyWeatherList for each day
         for (JsonElement dailyElement : dailyList) {
             JsonObject dailyObject = dailyElement.getAsJsonObject();
 
@@ -108,7 +128,7 @@ public class ReadFile implements iReadAndWriteToFile {
             String description = weatherObject.get("description").getAsString();
             int weatherCode = weatherObject.get("id").getAsInt();
 
-            DailyWeatherData dailyWeatherData = new DailyWeatherData(formattedDate, formattedTemps, description, weatherCode);
+            DailyWeather dailyWeatherData = new DailyWeather(formattedDate, formattedTemps, description, weatherCode);
             dailyWeatherList.add(dailyWeatherData);
         }
         return dailyWeatherList;  

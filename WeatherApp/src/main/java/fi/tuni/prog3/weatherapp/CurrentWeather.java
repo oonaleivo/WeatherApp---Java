@@ -4,7 +4,7 @@
  */
 package fi.tuni.prog3.weatherapp;
 
-public class WeatherData {
+public class CurrentWeather {
     private final double currentTemp;
     private final double tempMin;
     private final double tempMax;
@@ -17,7 +17,7 @@ public class WeatherData {
     private final String description;
     private final int weatherCode;
 
-    public WeatherData(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double wind, String description, int weatherCode) {
+    public CurrentWeather(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double wind, String description, int weatherCode) {
         this.currentTemp = currentTemp;
         this.tempMin = tempMin;
         this.tempMax = tempMax;

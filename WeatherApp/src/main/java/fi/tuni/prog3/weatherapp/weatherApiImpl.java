@@ -105,8 +105,8 @@ public class weatherApiImpl implements iAPI {
     public String getHourlyForecast(double lat, double lon) {
         String hourlyJsonData = "";
         // Build the API URL
-        String apiUrl = String.format("https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=%f&lon=%f&appid=%s&units=%s",
-                lat, lon, apiKey, "metric");
+        String apiUrl = String.format("https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=%f&lon=%f&appid=%s&cnt=%d&units=%s",
+                lat, lon, apiKey, 24, "metric"); // get hourly forcast for the next 24 hours
 
         // Create an HttpClient
         HttpClient httpClient = HttpClient.newHttpClient();
