@@ -4,6 +4,8 @@
  */
 package fi.tuni.prog3.weatherapp;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -15,6 +17,8 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 /**
  *
@@ -50,7 +54,7 @@ public class ReadFile implements iReadAndWriteToFile {
         }
     }
     
-    public WeatherData getWeather() {
+    public WeatherData getCurrentWeather() {
         JsonObject jsonObject = JsonParser.parseString(currentData).getAsJsonObject();
         
         // Extracting required data, minus 273.15 to convert kelvin to celcius
@@ -80,25 +84,47 @@ public class ReadFile implements iReadAndWriteToFile {
         
     }
     
-    public void getDailyWeather() {
+    public ArrayList<DailyWeatherData> getDailyWeather() {
+        ArrayList<DailyWeatherData> dailyWeatherList = new ArrayList<>();
+        
         JsonObject jsonObject = JsonParser.parseString(dailyData).getAsJsonObject();
-        //DailyWeatherData(int date, double maxTemp, double minTemp, String description)
+        JsonArray dailyList = jsonObject.getAsJsonArray("list"); // list of days
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.");
+
+        // Create DailyWeatherData object and save to dailyWeatherList for each day
+        for (JsonElement dailyElement : dailyList) {
+            JsonObject dailyObject = dailyElement.getAsJsonObject();
+
+            long timestamp = dailyObject.getAsJsonPrimitive("dt").getAsLong();
+            LocalDateTime date = convertTimestampToDate(timestamp);
+            String formattedDate = date.format(formatter);
+
+            JsonObject tempObject = dailyObject.getAsJsonObject("temp");
+            double maxTemp = tempObject.getAsJsonPrimitive("max").getAsDouble();
+            double minTemp = tempObject.getAsJsonPrimitive("min").getAsDouble();
+            
+            JsonObject weatherObject = dailyObject.getAsJsonArray("weather").get(0).getAsJsonObject();
+            String description = weatherObject.get("description").getAsString();
+            int weatherCode = weatherObject.get("id").getAsInt();
+
+            DailyWeatherData dailyWeatherData = new DailyWeatherData(formattedDate, maxTemp, minTemp, description, weatherCode);
+            dailyWeatherList.add(dailyWeatherData);
+        }
+        return dailyWeatherList;  
     }
 
+    //tarkistetaanko me boolean palautusta missään? voisko olla vaan void
     @Override
     public boolean writeToFile(String fileName) throws IOException {
         if (dataToWrite == null) {
             throw new IllegalStateException("No data set to write.");
         }
 
-        // Specify the folder name
         String folderName = "weatherData";
-
-        // Combine the folder name and file name to get the full path
         Path filePath = Paths.get(folderName, fileName);
 
         try {
-            Files.createDirectories(filePath.getParent());  // Ensure the folder exists
+            Files.createDirectories(filePath.getParent());  // Make sure the folder exists
             Files.writeString(filePath, dataToWrite, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             return true;
         } catch (IOException e) {

@@ -50,10 +50,8 @@ https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa loc
 luokilla saa muutettua päiviksi. */
 
 
-// koodeja pitää jaotella useampiin ryhmiin
 // päiväkohtainen ennuste sectio pitää tehdä
 // tuntikohtainen ennuste sectio pitää tehdä
-// pitää tallentaa viimesin haettu kaupunki - tehty!
 // pitää asettaa rain 0 jos null
 // kuvat rain, wind, humidity ?
 // yksikkötestit
@@ -64,7 +62,8 @@ luokilla saa muutettua päiviksi. */
 // missä päiväkohtasessa ennusteessa lukee, että minkä päivän ennuste se on
 
 public class WeatherApp extends Application {
-    private WeatherData weather;
+    private WeatherData currentWeather;
+    private ArrayList<DailyWeatherData> dailyWeatherList;
     private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
     private ImageView icon;
 
@@ -84,7 +83,8 @@ public class WeatherApp extends Application {
         weatherApi.lookUpLocation(lastSearchedCity);  
         ReadFile file = new ReadFile();
         file.readFromFile("weatherData");
-        weather = file.getWeather();
+        currentWeather = file.getCurrentWeather();
+        dailyWeatherList = file.getDailyWeather();
         
         // Create the main sections
         HBox menuSection = createMenuSection();
@@ -158,13 +158,13 @@ public class WeatherApp extends Application {
     }
         
     private void updateCurrentWeatherSection() {
-        if (weather != null) {
-            locationLabel.setText(weather.getCityName());
-            tempLabel.setText(String.format("%.1f ℃", weather.getCurrentTemp()));
-            feelsLikeLabel.setText(String.format("Feels like %.1f ℃", weather.getFeelsLike()));
+        if (currentWeather != null) {
+            locationLabel.setText(currentWeather.getCityName());
+            tempLabel.setText(String.format("%.1f ℃", currentWeather.getCurrentTemp()));
+            feelsLikeLabel.setText(String.format("Feels like %.1f ℃", currentWeather.getFeelsLike()));
             rainLabel.setText("rain");
-            windLabel.setText(String.format("wind: %.1f", weather.getWind()));
-            humLabel.setText(String.format("humidity: %d", weather.getHumidity()));
+            windLabel.setText(String.format("wind: %.1f", currentWeather.getWind()));
+            humLabel.setText(String.format("humidity: %d", currentWeather.getHumidity()));
             icon.setImage(getIcon().getImage());
         }
     }
@@ -219,7 +219,7 @@ public class WeatherApp extends Application {
     }
 
     private ImageView getIcon() {
-       int weatherCode = weather.getWeatherCode();
+       int weatherCode = currentWeather.getWeatherCode();
           
        List<Integer> lightrainthunderstorm = new ArrayList<>(Arrays.asList(200,230,231));
        List<Integer> heavythunderstorm = new ArrayList<>(Arrays.asList( 201, 202, 211, 212, 221, 232));
@@ -453,7 +453,7 @@ private void addToFavorites(String cityName) {
         try {
             ReadFile file = new ReadFile();
             file.readFromFile("weatherData");
-            weather = file.getWeather();
+            currentWeather = file.getCurrentWeather();
             Platform.runLater(this::updateCurrentWeatherSection);
         } catch (IOException e) {
         }
