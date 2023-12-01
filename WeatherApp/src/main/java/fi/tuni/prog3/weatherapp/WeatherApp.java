@@ -68,6 +68,8 @@ public class WeatherApp extends Application {
     private ArrayList<HourlyWeather> hourlyWeatherList;
     private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
     private ImageView icon;
+            // Create Hbox to be the main structure
+        HBox hourlySection = new HBox(10);
 
     private Menu favoritesMenu;
     private MenuBar menuBar;
@@ -179,8 +181,7 @@ public class WeatherApp extends Application {
     }
     
     private HBox createHourlySection() {
-        // Create Hbox to be the main structure
-        HBox hourlySection = new HBox(10);
+
         hourlySection.setPadding(new Insets(10));
         
         // Create a VBox for each hour with hourly data and add them to the HBox
@@ -203,10 +204,49 @@ public class WeatherApp extends Application {
         hourlySection.setPrefWidth(50*24); // Calculate the width based on the content
         hourlySection.setStyle("-fx-background-color: lightyellow;");
         hourlySection.setPrefHeight(180);
+        
+        updateHourlyWeatherSection();
 
         return hourlySection;
     }
     
+        private void updateHourlyWeatherSection() {
+        // Update content with new data
+        if (hourlyWeatherList != null && !hourlyWeatherList.isEmpty()) {
+            int index = 0;
+            for (HourlyWeather data : hourlyWeatherList) {
+                // Assuming hourlySection is an HBox containing your existing hourly data
+                if (index < hourlySection.getChildren().size()) {
+                    VBox hour = (VBox) hourlySection.getChildren().get(index);
+
+                    // Update existing labels and icon
+                    Label timeLabel = (Label) hour.getChildren().get(0);
+                    timeLabel.setText(data.getTime());
+
+                    ImageView hourlyIcon = (ImageView) hour.getChildren().get(1);
+                    hourlyIcon.setImage(getIcon(data.getWeatherCode()).getImage());
+
+                    Label hourlyTempLabel = (Label) hour.getChildren().get(2);
+                    hourlyTempLabel.setText(data.getTemp());
+                    hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
+                    
+                    System.out.print(data.getTemp());
+
+                    index++;
+                } else {
+                    // Handle the case where there's not enough existing VBox elements for the new data
+                    break;
+                }
+            }
+        }
+
+        // Set style
+        hourlySection.setPrefWidth(50 * 24); // Calculate the width based on the content
+        hourlySection.setStyle("-fx-background-color: lightyellow;");
+        hourlySection.setPrefHeight(180);
+    }
+
+        
     private HBox createDailySection() {
         // Create Hbox to be the main structure
         HBox dailySection = new HBox(10);
@@ -455,32 +495,33 @@ public class WeatherApp extends Application {
         }
     }
     
-private void addToFavorites(String cityName) {
-    try {
-        Path filePath = Paths.get("favorites");
-        if (!Files.exists(filePath)) {
-            Files.createFile(filePath);
+    private void addToFavorites(String cityName) {
+        try {
+            Path filePath = Paths.get("favorites");
+            if (!Files.exists(filePath)) {
+                Files.createFile(filePath);
+            }
+
+            String standardizedCityName = cityName.trim().toLowerCase();
+            List<String> favorites = Files.readAllLines(filePath);
+
+            List<String> standardizedFavorites = favorites.stream()
+                                                          .map(String::trim)
+                                                          .map(String::toLowerCase)
+                                                          .collect(Collectors.toList());
+
+            if (!standardizedFavorites.contains(standardizedCityName)) {
+                Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
+                loadFavorites();
+                Platform.runLater(() -> secondWindowInfoText.setText("Favorite successfully saved!"));
+            } else {
+                Platform.runLater(() -> secondWindowInfoText.setText("City is already a favorite."));
+            }
+        } catch (IOException ex) {
+            Platform.runLater(() -> secondWindowInfoText.setText("Error: " + ex.getMessage()));
         }
-
-        String standardizedCityName = cityName.trim().toLowerCase();
-        List<String> favorites = Files.readAllLines(filePath);
-
-        List<String> standardizedFavorites = favorites.stream()
-                                                      .map(String::trim)
-                                                      .map(String::toLowerCase)
-                                                      .collect(Collectors.toList());
-
-        if (!standardizedFavorites.contains(standardizedCityName)) {
-            Files.writeString(filePath, cityName + System.lineSeparator(), StandardOpenOption.APPEND);
-            loadFavorites();
-            Platform.runLater(() -> secondWindowInfoText.setText("Favorite successfully saved!"));
-        } else {
-            Platform.runLater(() -> secondWindowInfoText.setText("City is already a favorite."));
-        }
-    } catch (IOException ex) {
-        Platform.runLater(() -> secondWindowInfoText.setText("Error: " + ex.getMessage()));
     }
-}
+
 
     private void performSearch(String cityName) {
         weatherApiImpl weatherApi = new weatherApiImpl();
@@ -489,13 +530,21 @@ private void addToFavorites(String cityName) {
         try {
             ReadFile file = new ReadFile();
             file.readFromFile("weatherData");
+            
+            hourlyWeatherList = file.getHourlyWeather(); // Update hourlyWeatherList
+            Platform.runLater(this::updateHourlyWeatherSection);
+            
             currentWeather = file.getCurrentWeather();
             Platform.runLater(this::updateCurrentWeatherSection);
+
+
         } catch (IOException e) {
+            // Handle exception
         }
-        
+
         saveLastSearchedCity(cityName);
     }
+
 
         public static void main(String[] args) {
             launch();
