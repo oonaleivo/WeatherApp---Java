@@ -53,11 +53,10 @@ https://stackoverflow.com/questions/1844688/how-to-read-all-files-in-a-folder-fr
 
 https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa localdate + localdatetime 
 luokilla saa muutettua päiviksi. */
-// päiväkohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia - tehty!
-// tuntikohtainen ennusteen päivittäminen, nyt ei päivitä jos hakee uutta kaupunkia - tehty!
-// current temp meni pieneksi, en pysty muuttamaan fonttikokoa??
-// pitää asettaa rain 0 jos null
-// rain wind humidity pitää lisätä yksiköt (ja kuvat)
+
+// pitääkö jotenkin estää että ei saa hakea kaupunkeja mitkä ei oo suomessa
+// vois laittaa lumen määrän eikä sateen määrän sillon kun sataa lunta jos jaksetaan
+// tarviiko väriä ja kokoa asettaa uudestaan update funktioissa?
 // onko selkeempi jos päiväennusteessa lukee min ja max omilla riveillä eikä ...
 // lopuksi tehään nätin näköseksi + nyt ei kauheesti "selkeää omaleimaisuutta annettuun pohjaan verrattuna"
 // yksikkötestit
@@ -140,7 +139,7 @@ public class WeatherApp extends Application {
         locationLabel = new Label();
         locationLabel.setStyle("-fx-font: 30 Calibri;");
         tempLabel = new Label();
-        tempLabel.setStyle("-fx-font: 50 Calibri;");
+        tempLabel.setStyle("-fx-font: 40 Calibri;");
         feelsLikeLabel = new Label();
         rainLabel = new Label();
         windLabel = new Label();
@@ -160,7 +159,7 @@ public class WeatherApp extends Application {
         currentInfo.add(humLabel, 2, 3);
 
         currentInfo.setStyle("-fx-background-color: white;");
-        currentInfo.setPrefHeight(300);
+        currentInfo.setPrefHeight(250);
         currentInfo.setAlignment(Pos.CENTER);
 
         HBox currentSection = new HBox(30);
@@ -183,9 +182,9 @@ public class WeatherApp extends Application {
             locationLabel.setText(currentWeather.getCityName());
             tempLabel.setText(String.format("%.1f ℃", currentWeather.getCurrentTemp()));
             feelsLikeLabel.setText(String.format("Feels like %.1f ℃", currentWeather.getFeelsLike()));
-            rainLabel.setText("rain");
-            windLabel.setText(String.format("wind: %.1f", currentWeather.getWind()));
-            humLabel.setText(String.format("humidity: %d", currentWeather.getHumidity()));
+            rainLabel.setText(String.format("Rain: %.1f mm", currentWeather.getRain()));
+            windLabel.setText(String.format("Wind: %.1f m/s", currentWeather.getWind()));
+            humLabel.setText(String.format("Humidity: %d %%", currentWeather.getHumidity()));
             icon.setImage(getIcon(currentWeather.getWeatherCode()).getImage());
         }
     }
@@ -209,7 +208,7 @@ public class WeatherApp extends Application {
             hourlyIcon.setFitHeight(40);
             Label hourlyTempLabel = new Label(data.getTemp());
             hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
-            tempLabel.setStyle("-fx-font: 18 Calibri;");
+            hourlyTempLabel.setStyle("-fx-font: 18 Calibri;");
             hour.getChildren().addAll(timeLabel, hourlyIcon, hourlyTempLabel);
             hour.setAlignment(Pos.CENTER);
             hourlySection.getChildren().add(hour);
@@ -218,7 +217,7 @@ public class WeatherApp extends Application {
         // Set style
         hourlySection.setPrefWidth(50 * 24); // Calculate the width based on the content
         hourlySection.setStyle("-fx-background-color: lightyellow;");
-        hourlySection.setPrefHeight(180);
+        hourlySection.setPrefHeight(200);
 
         updateHourlyWeatherSection();
 
@@ -454,7 +453,7 @@ public class WeatherApp extends Application {
     /**
      * Get the Search button for the UI.
      *
-     * @return Button for searching and accessing favorites.
+     * @return Button for searching and accessing favourites.
      */
     private Button getSearchButton() {
         // Create a MenuBar
@@ -468,7 +467,7 @@ public class WeatherApp extends Application {
     /**
     * Opens the search window, allowing the user to enter a city name for weather information.
     * If the window does not exist, it creates a new stage; otherwise, it clears the text field.
-    * The method handles searching for a city, adding it to favorites, and updating UI elements.
+    * The method handles searching for a city, adding it to favourites, and updating UI elements.
     */
     private void openSearchWindow() {
         // Check if the searchStage is already created

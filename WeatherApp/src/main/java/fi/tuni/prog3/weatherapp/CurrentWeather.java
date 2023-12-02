@@ -12,12 +12,12 @@ public class CurrentWeather {
     private final int clouds;
     private final int humidity;
     private final String cityName;
-    //private final Double rain;
+    private final double rain;
     private final double wind;
     private final String description;
     private final int weatherCode;
 
-    public CurrentWeather(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double wind, String description, int weatherCode) {
+    public CurrentWeather(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double rain, double wind, String description, int weatherCode) {
         this.currentTemp = currentTemp;
         this.tempMin = tempMin;
         this.tempMax = tempMax;
@@ -25,7 +25,7 @@ public class CurrentWeather {
         this.clouds = clouds;
         this.humidity = humidity;
         this.cityName = cityName;
-        //this.rain = (rain != null) ? rain : 0.0; // Set rain to 0 if it's null
+        this.rain = rain;
         this.wind = wind;
         this.description = description;
         this.weatherCode = weatherCode;
@@ -58,6 +58,10 @@ public class CurrentWeather {
     
     public String getCityName() {
         return cityName;
+    }
+    
+    public double getRain() {
+        return rain;
     }
     
     public double getWind() {

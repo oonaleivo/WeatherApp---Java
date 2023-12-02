@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  *
@@ -56,7 +57,7 @@ public class ReadFile implements iReadAndWriteToFile {
     
     public CurrentWeather getCurrentWeather() {
         JsonObject jsonObject = JsonParser.parseString(currentJsonData).getAsJsonObject();
-        
+        double rain;
         // Extracting required data
         double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
         double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble();
@@ -65,12 +66,17 @@ public class ReadFile implements iReadAndWriteToFile {
         int clouds = jsonObject.getAsJsonObject("clouds").get("all").getAsInt();
         int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
         String cityName = jsonObject.get("name").getAsString();
-        //double rain = jsonObject.getAsJsonObject("rain").get("1h").getAsDouble();
+        try { 
+            rain = jsonObject.getAsJsonObject("rain").get("1h").getAsDouble();
+        } // Set rain as 0 if it is null
+        catch (NullPointerException | NumberFormatException e) {
+              rain = 0.0;
+                }
         double wind = jsonObject.getAsJsonObject("wind").get("speed").getAsDouble();
         String description = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("description").getAsString();
         int weatherCode = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("id").getAsInt();
 
-        CurrentWeather weatherData = new CurrentWeather(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, wind, description, weatherCode);
+        CurrentWeather weatherData = new CurrentWeather(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, rain , wind, description, weatherCode);
         
         return weatherData;
     }
