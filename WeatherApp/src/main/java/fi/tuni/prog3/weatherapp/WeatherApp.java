@@ -9,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,6 +26,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -70,7 +73,7 @@ public class WeatherApp extends Application {
     private CurrentWeather currentWeather;
     private ArrayList<DailyWeather> dailyWeatherList;
     private ArrayList<HourlyWeather> hourlyWeatherList;
-    private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel;
+    private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel, description;
     private ImageView icon;
     private HBox hourlySection = new HBox(10);
     private HBox dailySection = new HBox(10);
@@ -78,6 +81,7 @@ public class WeatherApp extends Application {
     private MenuBar menuBar;
     private Text secondWindowInfoText;
     private TextField cityTextField;
+    private boolean dayTime;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -93,6 +97,18 @@ public class WeatherApp extends Application {
         currentWeather = file.getCurrentWeather();
         dailyWeatherList = file.getDailyWeather();
         hourlyWeatherList = file.getHourlyWeather();
+        
+        // Check if it is day time or night time currently
+        int currentTimeInt = Integer.parseInt(hourlyWeatherList.get(0).getTime());
+        int sunsetTimeInt = Integer.parseInt(currentWeather.getSunset());
+        int sunriseTimeInt = Integer.parseInt(currentWeather.getSunrise());
+        
+        if (currentTimeInt < sunsetTimeInt && currentTimeInt >= sunriseTimeInt) {
+            dayTime = true;
+        }
+        else {
+            dayTime = false;
+        }
 
         // Create the main sections
         HBox menuSection = createMenuSection();
@@ -105,21 +121,33 @@ public class WeatherApp extends Application {
         scrollPane.setContent(hourlySection);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-        // Wrap the ScrollPane in a StackPane
         StackPane scrollPaneContainer = new StackPane(scrollPane);
-        scrollPaneContainer.setStyle(
-            "-fx-background-radius: 10; " +
-            "-fx-background-color: #157C9D; " +
-            "-fx-border-color: #A2CEDC; " + // Translucent white border
-            "-fx-border-width: 3; " +
-            "-fx-border-radius: 10;"
-        );
 
         // Create a VBox to hold the sections
         VBox root = new VBox(10); // 10 is the spacing between sections
         root.setPadding(new Insets(10));
-        root.setStyle("-fx-background-color: linear-gradient(to bottom, #0076B5, #5CC6FF);");
+        
+        if (dayTime) {  
+            scrollPaneContainer.setStyle(
+                "-fx-background-radius: 10; " +
+                "-fx-background-color: #36c3e6; " +
+                "-fx-border-color: #36c3e6; " + 
+                "-fx-border-width: 3; " +
+                "-fx-border-radius: 10;"
+            );
+            root.setStyle("-fx-background-color: linear-gradient(to bottom, #03A9F4, #4DD0E1);");
+        }
+        else {
+            scrollPaneContainer.setStyle(
+                "-fx-background-radius: 10; " +
+                "-fx-background-color: #5b75c0; " +
+                "-fx-border-color: #5b75c0; " + 
+                "-fx-border-width: 3; " +
+                "-fx-border-radius: 10;"
+            );
+            root.setStyle("-fx-background-color: linear-gradient(to bottom, #0D47A1, #7986CB);");
+        }
+        
         root.getChildren().addAll(menuSection, currentSection, hourlySection, scrollPaneContainer, dailySection);
 
         // Create the scene
@@ -163,6 +191,8 @@ public class WeatherApp extends Application {
         windLabel.setTextFill(Color.WHITE);
         humLabel = new Label();
         humLabel.setTextFill(Color.WHITE);
+        description = new Label();
+        description.setTextFill(Color.WHITE);
         icon = getIcon(currentWeather.getWeatherCode());
 
         GridPane currentInfo = new GridPane();
@@ -173,9 +203,10 @@ public class WeatherApp extends Application {
         currentInfo.add(locationLabel, 0, 0, 3, 1);
         currentInfo.add(tempLabel, 0, 1, 3, 1);
         currentInfo.add(feelsLikeLabel, 0, 2, 3, 1);
-        currentInfo.add(rainLabel, 0, 3);
-        currentInfo.add(windLabel, 1, 3);
-        currentInfo.add(humLabel, 2, 3);
+        currentInfo.add(description, 0, 3, 3, 1);
+        currentInfo.add(rainLabel, 0, 4);
+        currentInfo.add(windLabel, 1, 4);
+        currentInfo.add(humLabel, 2, 4);
 
         currentInfo.setPrefHeight(250);
         currentInfo.setAlignment(Pos.CENTER);
@@ -220,7 +251,12 @@ public class WeatherApp extends Application {
 
         // Set style
         hourlySection.setPrefWidth(80 * 24);
-        hourlySection.setStyle(" -fx-background-color: #69B7DF;"); 
+        if (dayTime) {
+            hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #36c3e6");
+        }
+        else {
+            hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #5b75c0");
+        }
         hourlySection.setPrefHeight(138);
 
         updateAllWeatherSections();
@@ -252,7 +288,12 @@ public class WeatherApp extends Application {
             minLabel.setStyle("-fx-font: 14 Calibri;");
             day.getChildren().addAll(dateLabel, dailyIcon, minLabel ,maxLabel);
             day.setAlignment(Pos.CENTER);
-            day.setStyle("-fx-background-radius: 10; -fx-background-color: #69B7DF;");
+            if (dayTime) {
+                day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(128, 222, 234, 0.5);");
+            }
+            else {
+                day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(159, 168, 218, 0.5);");
+            }
             day.setPadding(new Insets(15));
             dailySection.getChildren().add(day);
         }
@@ -334,6 +375,7 @@ public class WeatherApp extends Application {
             rainLabel.setText(String.format("Rain: %.1f mm", currentWeather.getRain()));
             windLabel.setText(String.format("Wind: %.1f m/s", currentWeather.getWind()));
             humLabel.setText(String.format("Humidity: %d %%", currentWeather.getHumidity()));
+            description.setText(currentWeather.getDescription());
             icon.setImage(getIcon(currentWeather.getWeatherCode()).getImage());
         }        
     }

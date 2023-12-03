@@ -16,8 +16,11 @@ public class CurrentWeather {
     private final double wind;
     private final String description;
     private final int weatherCode;
+    private final String sunset;
+    private final String sunrise;
+    
 
-    public CurrentWeather(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double rain, double wind, String description, int weatherCode) {
+    public CurrentWeather(double currentTemp, double tempMin, double tempMax, double feelsLike, int clouds, int humidity, String cityName, double rain, double wind, String description, int weatherCode, String sunset, String sunrise) {
         this.currentTemp = currentTemp;
         this.tempMin = tempMin;
         this.tempMax = tempMax;
@@ -29,6 +32,8 @@ public class CurrentWeather {
         this.wind = wind;
         this.description = description;
         this.weatherCode = weatherCode;
+        this.sunset = sunset;
+        this.sunrise = sunrise;
     }
 
     // Getters for each field
@@ -68,11 +73,19 @@ public class CurrentWeather {
         return wind;
     }
     
-    public String getdescription() {
+    public String getDescription() {
         return description;
     }
     
     public int getWeatherCode() {
         return weatherCode;
+    }
+
+    public String getSunset() {
+        return sunset;
+    }
+
+    public String getSunrise() {
+        return sunrise;
     }
 }

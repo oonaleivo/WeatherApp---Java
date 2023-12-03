@@ -75,8 +75,17 @@ public class ReadFile implements iReadAndWriteToFile {
         double wind = jsonObject.getAsJsonObject("wind").get("speed").getAsDouble();
         String description = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("description").getAsString();
         int weatherCode = jsonObject.getAsJsonArray("weather").get(0).getAsJsonObject().get("id").getAsInt();
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH");
+        long sunsetLong = jsonObject.getAsJsonObject("sys").get("sunset").getAsLong();
+        LocalDateTime sunsetTime = convertTimestampToDate(sunsetLong);
+        String sunset = sunsetTime.format(formatter);
+        
+        long sunriseLong = jsonObject.getAsJsonObject("sys").get("sunrise").getAsLong();
+        LocalDateTime sunriseTime = convertTimestampToDate(sunriseLong);
+        String sunrise = sunriseTime.format(formatter);
 
-        CurrentWeather weatherData = new CurrentWeather(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, rain , wind, description, weatherCode);
+        CurrentWeather weatherData = new CurrentWeather(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, rain , wind, description, weatherCode, sunset, sunrise);
         
         return weatherData;
     }
