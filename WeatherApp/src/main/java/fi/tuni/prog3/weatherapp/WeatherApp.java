@@ -59,8 +59,8 @@ luokilla saa muutettua päiviksi. */
 // pitää lisää error handling noigin keltasiin printstacktrace juttuihin
 // pitääkö jotenkin estää että ei saa hakea kaupunkeja mitkä ei oo suomessa
 // vois laittaa lumen määrän eikä sateen määrän sillon kun sataa lunta jos jaksetaan
-// onko selkeempi jos päiväennusteessa lukee min ja max omilla riveillä eikä ...
 // lopuksi tehään nätin näköseksi + nyt ei kauheesti "selkeää omaleimaisuutta annettuun pohjaan verrattuna"
+// tarkistetaan kaikki kommentit ja poistetaan testitulostukset
 // yksikkötestit
 
 public class WeatherApp extends Application {
@@ -108,6 +108,7 @@ public class WeatherApp extends Application {
         // Create a VBox to hold the sections
         VBox root = new VBox(10); // 10 is the spacing between sections
         root.setPadding(new Insets(10));
+        root.setStyle("-fx-background-color: linear-gradient(to bottom, #157C9D, #0FABDD);");
         root.getChildren().addAll(menuSection, currentSection, hourlySection, scrollPane, dailySection);
 
         // Create the scene
@@ -126,7 +127,6 @@ public class WeatherApp extends Application {
         HBox menuSection = new HBox(10);
         menuSection.setPadding(new Insets(10));
         menuSection.getChildren().addAll(search, quit);
-        menuSection.setStyle("-fx-background-color: lightyellow;");
         menuSection.setPrefHeight(40);
 
         return menuSection;
@@ -140,12 +140,18 @@ public class WeatherApp extends Application {
     private HBox createCurrentSection() {
         locationLabel = new Label();
         locationLabel.setStyle("-fx-font: 30 Calibri;");
+        locationLabel.setTextFill(Color.WHITE);
         tempLabel = new Label();
         tempLabel.setStyle("-fx-font: 40 Calibri;");
+        tempLabel.setTextFill(Color.WHITE);
         feelsLikeLabel = new Label();
+        feelsLikeLabel.setTextFill(Color.WHITE);
         rainLabel = new Label();
+        rainLabel.setTextFill(Color.WHITE);
         windLabel = new Label();
+        windLabel.setTextFill(Color.WHITE);
         humLabel = new Label();
+        humLabel.setTextFill(Color.WHITE);
         icon = getIcon(currentWeather.getWeatherCode());
 
         GridPane currentInfo = new GridPane();
@@ -160,20 +166,19 @@ public class WeatherApp extends Application {
         currentInfo.add(windLabel, 1, 3);
         currentInfo.add(humLabel, 2, 3);
 
-        currentInfo.setStyle("-fx-background-color: white;");
         currentInfo.setPrefHeight(250);
         currentInfo.setAlignment(Pos.CENTER);
 
         HBox currentSection = new HBox(30);
         currentSection.setPadding(new Insets(10));
         currentSection.getChildren().addAll(icon, currentInfo);
-        currentSection.setStyle("-fx-background-color: white;");
         currentSection.setPrefHeight(300);
         currentSection.setAlignment(Pos.CENTER);
 
         updateAllWeatherSections();
 
         return currentSection;
+
     }
 
     /**
@@ -188,13 +193,12 @@ public class WeatherApp extends Application {
         // Create a VBox for each hour with hourly data and add them to the HBox
         for (HourlyWeather data : hourlyWeatherList) {
             VBox hour = new VBox(10);
-            Label timeLabel = new Label(data.getTime());
+            Label timeLabel = new Label();
             timeLabel.setStyle("-fx-font: 18 Calibri;");
             ImageView hourlyIcon = getIcon(data.getWeatherCode());
             hourlyIcon.setFitWidth(40);
             hourlyIcon.setFitHeight(40);
-            Label hourlyTempLabel = new Label(data.getTemp());
-            hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
+            Label hourlyTempLabel = new Label();
             hourlyTempLabel.setStyle("-fx-font: 18 Calibri;");
             hourlyTempLabel.setMinWidth(70);
             
@@ -205,7 +209,7 @@ public class WeatherApp extends Application {
 
         // Set style
         hourlySection.setPrefWidth(80 * 24);
-        hourlySection.setStyle("-fx-background-color: lightyellow;");
+        hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #A2CEDC;"); 
         hourlySection.setPrefHeight(200);
 
         updateAllWeatherSections();
@@ -221,27 +225,29 @@ public class WeatherApp extends Application {
     private HBox createDailySection() {
         // Create Hbox to be the main structure
         dailySection.setPadding(new Insets(10));
-        dailySection.setSpacing(50);
+        dailySection.setSpacing(25);
 
         // Create a VBox for each day with daily data and add them to the HBox
         for (DailyWeather data : dailyWeatherList) {
             VBox day = new VBox(10);
-            Label dateLabel = new Label(data.getDate());
+            Label dateLabel = new Label();
             dateLabel.setStyle("-fx-font: 18 Calibri;");
             ImageView dailyIcon = getIcon(data.getWeatherCode());
             dailyIcon.setFitWidth(60);
             dailyIcon.setFitHeight(60);
-            Label maxLabel = new Label(String.format("max: %.1f", data.getMaxTemp()));
-            Label minLabel = new Label(String.format("min: %.1f", data.getMinTemp()));
+            Label maxLabel = new Label();
+            Label minLabel = new Label();
             maxLabel.setStyle("-fx-font: 14 Calibri;");
             minLabel.setStyle("-fx-font: 14 Calibri;");
             day.getChildren().addAll(dateLabel, dailyIcon, minLabel ,maxLabel);
             day.setAlignment(Pos.CENTER);
+            day.setStyle("-fx-background-radius: 10; -fx-background-color: #A2CEDC;");
+            day.setPadding(new Insets(15));
             dailySection.getChildren().add(day);
         }
 
         // Set style
-        dailySection.setStyle("-fx-background-color: white;");
+        //dailySection.setStyle("-fx-background-color: white;");
         dailySection.setPrefHeight(180);
         dailySection.setAlignment(Pos.CENTER);
 
@@ -295,12 +301,12 @@ public class WeatherApp extends Application {
 
                     ImageView dailyIcon = (ImageView) day.getChildren().get(1);
                     dailyIcon.setImage(getIcon(data.getWeatherCode()).getImage());
-
-                    Label maxLabel = (Label) day.getChildren().get(2);
-                    maxLabel.setText(String.format("max: %.1f", data.getMaxTemp()));
                     
                     Label minLabel = (Label) day.getChildren().get(2);
-                    minLabel.setText(String.format("max: %.1f", data.getMinTemp()));
+                    minLabel.setText(String.format("min: %.1f", data.getMinTemp()));
+                        
+                    Label maxLabel = (Label) day.getChildren().get(3);
+                    maxLabel.setText(String.format("max: %.1f", data.getMaxTemp()));
 
                     index++;
                 } else {
