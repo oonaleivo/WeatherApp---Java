@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -57,8 +59,6 @@ luokilla saa muutettua päiviksi. */
 // pitää lisää error handling noigin keltasiin printstacktrace juttuihin
 // pitääkö jotenkin estää että ei saa hakea kaupunkeja mitkä ei oo suomessa
 // vois laittaa lumen määrän eikä sateen määrän sillon kun sataa lunta jos jaksetaan
-// tarviiko väriä ja kokoa asettaa uudestaan update funktioissa?
-        // ei tarvii, hyvä huomio, poistin ne!
 // onko selkeempi jos päiväennusteessa lukee min ja max omilla riveillä eikä ...
 // lopuksi tehään nätin näköseksi + nyt ei kauheesti "selkeää omaleimaisuutta annettuun pohjaan verrattuna"
 // yksikkötestit
@@ -196,13 +196,15 @@ public class WeatherApp extends Application {
             Label hourlyTempLabel = new Label(data.getTemp());
             hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
             hourlyTempLabel.setStyle("-fx-font: 18 Calibri;");
+            hourlyTempLabel.setMinWidth(70);
+            
             hour.getChildren().addAll(timeLabel, hourlyIcon, hourlyTempLabel);
             hour.setAlignment(Pos.CENTER);
             hourlySection.getChildren().add(hour);
         }
 
         // Set style
-        hourlySection.setPrefWidth(50 * 24); // Calculate the width based on the content
+        hourlySection.setPrefWidth(80 * 24);
         hourlySection.setStyle("-fx-background-color: lightyellow;");
         hourlySection.setPrefHeight(200);
 
@@ -436,7 +438,7 @@ public class WeatherApp extends Application {
     /**
      * Get the Search button for the UI.
      *
-     * @return Button for searching and accessing favorites.
+     * @return Button for searching and accessing favourites.
      */
     private Button getSearchButton() {
         // Create a MenuBar
@@ -450,7 +452,7 @@ public class WeatherApp extends Application {
     /**
     * Opens the search window, allowing the user to enter a city name for weather information.
     * If the window does not exist, it creates a new stage; otherwise, it clears the text field.
-    * The method handles searching for a city, adding it to favorites, and updating UI elements.
+    * The method handles searching for a city, adding it to favourites, and updating UI elements.
     */
     private void openSearchWindow() {
         // Check if the searchStage is already created

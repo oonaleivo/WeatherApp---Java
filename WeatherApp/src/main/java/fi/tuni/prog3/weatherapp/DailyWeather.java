@@ -2,13 +2,15 @@ package fi.tuni.prog3.weatherapp;
 
 public class DailyWeather {
     private final String date;
-    private final String temp;
+    private final double maxTemp;
+    private final double minTemp;
     private final String description;
     private final int weatherCode;
 
-    public DailyWeather(String date, String temp, String description, int weatherCode) {
+    public DailyWeather(String date, double maxTemp, double minTemp, String description, int weatherCode) {
         this.date = date;
-        this.temp = temp;
+        this.maxTemp = maxTemp;
+        this.minTemp = minTemp;
         this.description = description;
         this.weatherCode = weatherCode;
     }
@@ -17,8 +19,12 @@ public class DailyWeather {
         return date;
     }
 
-    public String getTemp() {
-        return temp;
+    public double getmaxTemp() {
+        return maxTemp;
+    }
+
+    public double getMinTemp() {
+        return minTemp;
     }
 
     public String getDescription() {
