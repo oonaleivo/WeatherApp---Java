@@ -19,7 +19,7 @@ public class DailyWeather {
         return date;
     }
 
-    public double getmaxTemp() {
+    public double getMaxTemp() {
         return maxTemp;
     }
 

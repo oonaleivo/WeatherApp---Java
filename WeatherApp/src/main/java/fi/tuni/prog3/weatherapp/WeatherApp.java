@@ -221,6 +221,7 @@ public class WeatherApp extends Application {
     private HBox createDailySection() {
         // Create Hbox to be the main structure
         dailySection.setPadding(new Insets(10));
+        dailySection.setSpacing(50);
 
         // Create a VBox for each day with daily data and add them to the HBox
         for (DailyWeather data : dailyWeatherList) {
@@ -230,9 +231,11 @@ public class WeatherApp extends Application {
             ImageView dailyIcon = getIcon(data.getWeatherCode());
             dailyIcon.setFitWidth(60);
             dailyIcon.setFitHeight(60);
-            Label minMaxLabel = new Label(data.getTemp());
-            minMaxLabel.setStyle("-fx-font: 14 Calibri;");
-            day.getChildren().addAll(dateLabel, dailyIcon, minMaxLabel);
+            Label maxLabel = new Label(String.format("max: %.1f", data.getMaxTemp()));
+            Label minLabel = new Label(String.format("min: %.1f", data.getMinTemp()));
+            maxLabel.setStyle("-fx-font: 14 Calibri;");
+            minLabel.setStyle("-fx-font: 14 Calibri;");
+            day.getChildren().addAll(dateLabel, dailyIcon, minLabel ,maxLabel);
             day.setAlignment(Pos.CENTER);
             dailySection.getChildren().add(day);
         }
@@ -293,8 +296,11 @@ public class WeatherApp extends Application {
                     ImageView dailyIcon = (ImageView) day.getChildren().get(1);
                     dailyIcon.setImage(getIcon(data.getWeatherCode()).getImage());
 
-                    Label minMaxLabel = (Label) day.getChildren().get(2);
-                    minMaxLabel.setText(data.getTemp());
+                    Label maxLabel = (Label) day.getChildren().get(2);
+                    maxLabel.setText(String.format("max: %.1f", data.getMaxTemp()));
+                    
+                    Label minLabel = (Label) day.getChildren().get(2);
+                    minLabel.setText(String.format("max: %.1f", data.getMinTemp()));
 
                     index++;
                 } else {
