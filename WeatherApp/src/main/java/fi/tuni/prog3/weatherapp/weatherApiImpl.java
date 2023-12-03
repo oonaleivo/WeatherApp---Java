@@ -20,8 +20,9 @@ public class weatherApiImpl implements iAPI {
         double longitude = 0.0;
         
         // Build the API URL
-        String apiUrl = String.format("http://api.openweathermap.org/geo/1.0/direct?q=%s,%s&limit=%d&appid=%s",
-                loc, "FI", 1, apiKey);
+        String apiUrl = String.format("http://api.openweathermap.org/geo/1.0/direct?q=%s&limit=%d&appid=%s",
+                loc, 1, apiKey);
+
 
         // Create an HttpClient
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -45,10 +46,6 @@ public class weatherApiImpl implements iAPI {
                 longitude = jsonArray.get(0).getAsJsonObject().get("lon").getAsDouble();
                 
                 coordinates = String.format("lat %f, lon %f", latitude, longitude);
-
-                // poista testitulosteet jossain vaiheessa
-                System.out.printf("Latitude: %f%n", latitude);
-                System.out.printf("Longitude: %f%n", longitude);
 
             } else {
                 System.out.println("Failed to get location information. Status code: " + response.statusCode());
@@ -85,8 +82,6 @@ public class weatherApiImpl implements iAPI {
             if (response.statusCode() == 200) {
                 currentJsonData = response.body();
                 
-                //lisää tähän fileen tallennus
-                System.out.println("current: " + currentJsonData);
                 ReadFile file = new ReadFile();
                 file.setDataToWrite(currentJsonData);
                 file.writeToFile("currentWeatherData");
@@ -124,8 +119,6 @@ public class weatherApiImpl implements iAPI {
             if (response.statusCode() == 200) {
                 hourlyJsonData = response.body();
 
-                // Add file writing here
-                System.out.println("Hourly: " + hourlyJsonData);
                 ReadFile file = new ReadFile();
                 file.setDataToWrite(hourlyJsonData);
                 file.writeToFile("hourlyWeatherData");
@@ -163,8 +156,6 @@ public class weatherApiImpl implements iAPI {
             if (response.statusCode() == 200) {
                 dailyJsonData = response.body();
                 
-                //lisää tähän fileen tallennus
-                System.out.println("Daily: " + dailyJsonData);
                 ReadFile file = new ReadFile();
                 file.setDataToWrite(dailyJsonData);
                 file.writeToFile("dailyWeatherData");

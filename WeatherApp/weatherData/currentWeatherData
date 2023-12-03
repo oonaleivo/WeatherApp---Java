@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 {"coord":{"lon":23.1337,"lat":63.8391},"weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04n"}],"base":"stations","main":{"temp":-12.51,"feels_like":-17.94,"temp_min":-14.9,"temp_max":-8.36,"pressure":1014,"humidity":91},"visibility":10000,"wind":{"speed":2.57,"deg":40},"clouds":{"all":100},"dt":1701615047,"sys":{"type":2,"id":19523,"country":"FI","sunrise":1701589535,"sunset":1701607738},"timezone":7200,"id":651943,"name":"Kokkola","cod":200}
+=======
+{"coord":{"lon":24.0685,"lat":60.2526},"weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04n"}],"base":"stations","main":{"temp":-9.93,"feels_like":-9.93,"temp_min":-11.16,"temp_max":-7.65,"pressure":1014,"humidity":90,"sea_level":1014,"grnd_level":1005},"visibility":3027,"wind":{"speed":1.21,"deg":349,"gust":3.73},"clouds":{"all":100},"dt":1701614325,"sys":{"type":2,"id":2031998,"country":"FI","sunrise":1701587038,"sunset":1701609786},"timezone":7200,"id":647751,"name":"Lohja","cod":200}
+>>>>>>> Stashed changes
