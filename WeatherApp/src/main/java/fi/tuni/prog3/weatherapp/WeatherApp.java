@@ -54,9 +54,11 @@ https://stackoverflow.com/questions/1844688/how-to-read-all-files-in-a-folder-fr
 https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa localdate + localdatetime 
 luokilla saa muutettua päiviksi. */
 
+// pitää lisää error handling noigin keltasiin printstacktrace juttuihin
 // pitääkö jotenkin estää että ei saa hakea kaupunkeja mitkä ei oo suomessa
 // vois laittaa lumen määrän eikä sateen määrän sillon kun sataa lunta jos jaksetaan
 // tarviiko väriä ja kokoa asettaa uudestaan update funktioissa?
+        // ei tarvii, hyvä huomio, poistin ne!
 // onko selkeempi jos päiväennusteessa lukee min ja max omilla riveillä eikä ...
 // lopuksi tehään nätin näköseksi + nyt ei kauheesti "selkeää omaleimaisuutta annettuun pohjaan verrattuna"
 // yksikkötestit
@@ -169,24 +171,9 @@ public class WeatherApp extends Application {
         currentSection.setPrefHeight(300);
         currentSection.setAlignment(Pos.CENTER);
 
-        updateCurrentWeatherSection();
+        updateAllWeatherSections();
 
         return currentSection;
-    }
-
-    /**
-     * Update the content of the current weather section with new data.
-     */
-    private void updateCurrentWeatherSection() {
-        if (currentWeather != null) {
-            locationLabel.setText(currentWeather.getCityName());
-            tempLabel.setText(String.format("%.1f ℃", currentWeather.getCurrentTemp()));
-            feelsLikeLabel.setText(String.format("Feels like %.1f ℃", currentWeather.getFeelsLike()));
-            rainLabel.setText(String.format("Rain: %.1f mm", currentWeather.getRain()));
-            windLabel.setText(String.format("Wind: %.1f m/s", currentWeather.getWind()));
-            humLabel.setText(String.format("Humidity: %d %%", currentWeather.getHumidity()));
-            icon.setImage(getIcon(currentWeather.getWeatherCode()).getImage());
-        }
     }
 
     /**
@@ -219,49 +206,12 @@ public class WeatherApp extends Application {
         hourlySection.setStyle("-fx-background-color: lightyellow;");
         hourlySection.setPrefHeight(200);
 
-        updateHourlyWeatherSection();
+        updateAllWeatherSections();
 
         return hourlySection;
     }
-
-    /**
-     * Update the content of the hourly weather section with new data.
-     */
-    private void updateHourlyWeatherSection() {
-        // Update content with new data
-        if (hourlyWeatherList != null && !hourlyWeatherList.isEmpty()) {
-            int index = 0;
-            for (HourlyWeather data : hourlyWeatherList) {
-                // Assuming hourlySection is an HBox containing your existing hourly data
-                if (index < hourlySection.getChildren().size()) {
-                    VBox hour = (VBox) hourlySection.getChildren().get(index);
-
-                    // Update existing labels and icon
-                    Label timeLabel = (Label) hour.getChildren().get(0);
-                    timeLabel.setText(data.getTime());
-
-                    ImageView hourlyIcon = (ImageView) hour.getChildren().get(1);
-                    hourlyIcon.setImage(getIcon(data.getWeatherCode()).getImage());
-
-                    Label hourlyTempLabel = (Label) hour.getChildren().get(2);
-                    hourlyTempLabel.setText(data.getTemp());
-                    hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
-
-                    index++;
-                } else {
-                    // Handle the case where there's not enough existing VBox elements for the new data
-                    break;
-                }
-            }
-        }
-
-        // Set style
-        hourlySection.setPrefWidth(50 * 24); // Calculate the width based on the content
-        hourlySection.setStyle("-fx-background-color: lightyellow;");
-        hourlySection.setPrefHeight(180);
-    }
-
-    /**
+    
+        /**
      * Method to create the daily weather section of the UI.
      *
      * @return HBox containing the daily weather section.
@@ -290,16 +240,43 @@ public class WeatherApp extends Application {
         dailySection.setPrefHeight(180);
         dailySection.setAlignment(Pos.CENTER);
 
-        updateDailyWeatherSection();
+        updateAllWeatherSections();
 
         return dailySection;
     }
 
     /**
-     * Update the content of the daily weather section with new data.
+     * Update the content of all weather sections with new data.
      */
-    private void updateDailyWeatherSection() {
+    private void updateAllWeatherSections() {
         // Update content with new data
+        if (hourlyWeatherList != null && !hourlyWeatherList.isEmpty()) {
+            int index = 0;
+            for (HourlyWeather data : hourlyWeatherList) {
+                // Assuming hourlySection is an HBox containing your existing hourly data
+                if (index < hourlySection.getChildren().size()) {
+                    VBox hour = (VBox) hourlySection.getChildren().get(index);
+
+                    // Update existing labels and icon
+                    Label timeLabel = (Label) hour.getChildren().get(0);
+                    timeLabel.setText(data.getTime());
+
+                    ImageView hourlyIcon = (ImageView) hour.getChildren().get(1);
+                    hourlyIcon.setImage(getIcon(data.getWeatherCode()).getImage());
+
+                    Label hourlyTempLabel = (Label) hour.getChildren().get(2);
+                    hourlyTempLabel.setText(data.getTemp());
+                    hourlyTempLabel.setTooltip(new Tooltip(data.getTemp()));
+
+                    index++;
+                } else {
+                    // Handle the case where there's not enough existing VBox elements for the new data
+                    break;
+                }
+            }
+        }
+        
+                // Update content with new data
         if (dailyWeatherList != null && !dailyWeatherList.isEmpty()) {
             int index = 0;
             for (DailyWeather data : dailyWeatherList) {
@@ -324,12 +301,18 @@ public class WeatherApp extends Application {
                 }
             }
         }
-
-        // Set style
-        dailySection.setStyle("-fx-background-color: white;");
-        dailySection.setPrefHeight(180);
-        dailySection.setAlignment(Pos.CENTER);
+        
+        if (currentWeather != null) {
+            locationLabel.setText(currentWeather.getCityName());
+            tempLabel.setText(String.format("%.1f ℃", currentWeather.getCurrentTemp()));
+            feelsLikeLabel.setText(String.format("Feels like %.1f ℃", currentWeather.getFeelsLike()));
+            rainLabel.setText(String.format("Rain: %.1f mm", currentWeather.getRain()));
+            windLabel.setText(String.format("Wind: %.1f m/s", currentWeather.getWind()));
+            humLabel.setText(String.format("Humidity: %d %%", currentWeather.getHumidity()));
+            icon.setImage(getIcon(currentWeather.getWeatherCode()).getImage());
+        }        
     }
+
 
     /**
      * Save the last searched city to a file.
@@ -453,7 +436,7 @@ public class WeatherApp extends Application {
     /**
      * Get the Search button for the UI.
      *
-     * @return Button for searching and accessing favourites.
+     * @return Button for searching and accessing favorites.
      */
     private Button getSearchButton() {
         // Create a MenuBar
@@ -467,7 +450,7 @@ public class WeatherApp extends Application {
     /**
     * Opens the search window, allowing the user to enter a city name for weather information.
     * If the window does not exist, it creates a new stage; otherwise, it clears the text field.
-    * The method handles searching for a city, adding it to favourites, and updating UI elements.
+    * The method handles searching for a city, adding it to favorites, and updating UI elements.
     */
     private void openSearchWindow() {
         // Check if the searchStage is already created
@@ -626,13 +609,9 @@ public class WeatherApp extends Application {
             file.readFromFile("weatherData");
 
             hourlyWeatherList = file.getHourlyWeather(); // Update hourlyWeatherList
-            Platform.runLater(this::updateHourlyWeatherSection);
-
             dailyWeatherList = file.getDailyWeather();
-            Platform.runLater(this::updateDailyWeatherSection);
-
             currentWeather = file.getCurrentWeather();
-            Platform.runLater(this::updateCurrentWeatherSection);
+            Platform.runLater(this::updateAllWeatherSections);
 
         } catch (IOException e) {
             // Handle exception
