@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package fi.tuni.prog3.weatherapp;
 
-/**
- *
- * @author reett
- */
 public class HourlyWeather {
     private final String time;
     private final String temp;
@@ -29,8 +21,5 @@ public class HourlyWeather {
 
     public int getWeatherCode() {
         return weatherCode;
-    }
-    
-    
-    
+    }  
 }

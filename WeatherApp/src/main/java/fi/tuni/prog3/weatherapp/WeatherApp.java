@@ -26,11 +26,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -61,9 +56,6 @@ https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa loc
 luokilla saa muutettua päiviksi. */
 
 // pitää lisää error handling noigin keltasiin printstacktrace juttuihin
-// pitääkö jotenkin estää että ei saa hakea kaupunkeja mitkä ei oo suomessa
-// vois laittaa lumen määrän eikä sateen määrän sillon kun sataa lunta jos jaksetaan
-// lopuksi tehään nätin näköseksi + nyt ei kauheesti "selkeää omaleimaisuutta annettuun pohjaan verrattuna"
 // tarkistetaan kaikki kommentit ja poistetaan testitulostukset
 // yksikkötestit
 
@@ -85,7 +77,7 @@ public class WeatherApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        // get the weather
+        // get the weather of the last searched city
         String lastSearchedCity = loadLastSearchedCity();
         if (lastSearchedCity == null || lastSearchedCity.isEmpty()) {
             lastSearchedCity = "Tampere"; // Replace with a default city name
@@ -113,8 +105,8 @@ public class WeatherApp extends Application {
         // Create the main sections
         HBox menuSection = createMenuSection();
         HBox currentSection = createCurrentSection();
-        HBox hourlySection = createHourlySection();
-        HBox dailySection = createDailySection();
+        hourlySection = createHourlySection();
+        dailySection = createDailySection();
 
         // Create a horizontal scrollbar that is always shown for hourlySection
         ScrollPane scrollPane = new ScrollPane();
@@ -123,19 +115,20 @@ public class WeatherApp extends Application {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         StackPane scrollPaneContainer = new StackPane(scrollPane);
 
-        // Create a VBox to hold the sections
-        VBox root = new VBox(10); // 10 is the spacing between sections
+        // Create a VBox to hold all the sections
+        VBox root = new VBox(10);
         root.setPadding(new Insets(10));
         
+        // Set the color depending on the time of day
         if (dayTime) {  
             scrollPaneContainer.setStyle(
                 "-fx-background-radius: 10; " +
-                "-fx-background-color: #36c3e6; " +
-                "-fx-border-color: #36c3e6; " + 
+                "-fx-background-color: #a2e0eb; " +
+                "-fx-border-color: #a2e0eb; " + 
                 "-fx-border-width: 3; " +
                 "-fx-border-radius: 10;"
             );
-            root.setStyle("-fx-background-color: linear-gradient(to bottom, #03A9F4, #4DD0E1);");
+            root.setStyle("-fx-background-color: linear-gradient(to bottom, #29B6F6, #E0F7FA);");
         }
         else {
             scrollPaneContainer.setStyle(
@@ -145,22 +138,27 @@ public class WeatherApp extends Application {
                 "-fx-border-width: 3; " +
                 "-fx-border-radius: 10;"
             );
-            root.setStyle("-fx-background-color: linear-gradient(to bottom, #0D47A1, #7986CB);");
+            root.setStyle("-fx-background-color: linear-gradient(to bottom, #0D47A1, #512DA8);");
         }
         
+        // Add all the sections to the window
         root.getChildren().addAll(menuSection, currentSection, hourlySection, scrollPaneContainer, dailySection);
 
         // Create the scene
         Scene scene = new Scene(root, 600, 750);
 
         // Set the stage properties
-        stage.setTitle("OONAN JA REETAN WeatherApp");
+        stage.setTitle("WeatherApp");
         stage.setScene(scene);
         stage.show();
     }
 
+    /**
+     * Method to create the top menu section of the UI.
+     *
+     * @return HBox containing the menu section.
+     */
     private HBox createMenuSection() {
-        // create the top menu section
         Button search = getSearchButton();
         Button quit = getQuitButton();
         HBox menuSection = new HBox(10);
@@ -177,6 +175,7 @@ public class WeatherApp extends Application {
      * @return HBox containing the current weather section.
      */
     private HBox createCurrentSection() {
+        // Create labels and icon
         locationLabel = new Label();
         locationLabel.setStyle("-fx-font: 30 Calibri;");
         locationLabel.setTextFill(Color.WHITE);
@@ -195,11 +194,14 @@ public class WeatherApp extends Application {
         description.setTextFill(Color.WHITE);
         icon = getIcon(currentWeather.getWeatherCode());
 
+        // Create a grid to hold the labels
         GridPane currentInfo = new GridPane();
         currentInfo.setHgap(10);
         currentInfo.setVgap(10);
+        currentInfo.setPrefHeight(250);
+        currentInfo.setAlignment(Pos.CENTER);
 
-        // Add to column, row (column span, row span)
+        // Add items to column, row (column span, row span) of the grid
         currentInfo.add(locationLabel, 0, 0, 3, 1);
         currentInfo.add(tempLabel, 0, 1, 3, 1);
         currentInfo.add(feelsLikeLabel, 0, 2, 3, 1);
@@ -208,9 +210,7 @@ public class WeatherApp extends Application {
         currentInfo.add(windLabel, 1, 4);
         currentInfo.add(humLabel, 2, 4);
 
-        currentInfo.setPrefHeight(250);
-        currentInfo.setAlignment(Pos.CENTER);
-
+        // Create a HBox to hold the icon and currentInfo grid
         HBox currentSection = new HBox(30);
         currentSection.setPadding(new Insets(10));
         currentSection.getChildren().addAll(icon, currentInfo);
@@ -229,10 +229,9 @@ public class WeatherApp extends Application {
      * @return HBox containing the hourly weather section.
      */
     private HBox createHourlySection() {
-
         hourlySection.setPadding(new Insets(10));
 
-        // Create a VBox for each hour with hourly data and add them to the HBox
+        // Create a VBox for each hour with hourly data and add them to the section
         for (HourlyWeather data : hourlyWeatherList) {
             VBox hour = new VBox(10);
             Label timeLabel = new Label();
@@ -251,16 +250,15 @@ public class WeatherApp extends Application {
 
         // Set style
         hourlySection.setPrefWidth(80 * 24);
+        hourlySection.setPrefHeight(138);
         if (dayTime) {
-            hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #36c3e6");
+            hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #9edffb");
         }
         else {
             hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #5b75c0");
         }
-        hourlySection.setPrefHeight(138);
-
+        
         updateAllWeatherSections();
-
         return hourlySection;
     }
     
@@ -289,7 +287,7 @@ public class WeatherApp extends Application {
             day.getChildren().addAll(dateLabel, dailyIcon, minLabel ,maxLabel);
             day.setAlignment(Pos.CENTER);
             if (dayTime) {
-                day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(128, 222, 234, 0.5);");
+                day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(129, 212, 250, 0.5);");
             }
             else {
                 day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(159, 168, 218, 0.5);");
@@ -299,7 +297,6 @@ public class WeatherApp extends Application {
         }
 
         // Set style
-        //dailySection.setStyle("-fx-background-color: white;");
         dailySection.setPrefHeight(180);
         dailySection.setAlignment(Pos.CENTER);
 
@@ -316,7 +313,6 @@ public class WeatherApp extends Application {
         if (hourlyWeatherList != null && !hourlyWeatherList.isEmpty()) {
             int index = 0;
             for (HourlyWeather data : hourlyWeatherList) {
-                // Assuming hourlySection is an HBox containing your existing hourly data
                 if (index < hourlySection.getChildren().size()) {
                     VBox hour = (VBox) hourlySection.getChildren().get(index);
 
@@ -339,7 +335,7 @@ public class WeatherApp extends Application {
             }
         }
         
-                // Update content with new data
+        // Update content with new data
         if (dailyWeatherList != null && !dailyWeatherList.isEmpty()) {
             int index = 0;
             for (DailyWeather data : dailyWeatherList) {
@@ -391,7 +387,7 @@ public class WeatherApp extends Application {
             Path filePath = Paths.get("lastSearchedCity.txt");
             Files.writeString(filePath, cityName);
         } catch (IOException e) {
-            e.printStackTrace(); // Handle exception
+            System.err.println("Error saving last searched city: " + e.getMessage());
         }
     }
 
@@ -407,7 +403,7 @@ public class WeatherApp extends Application {
                 return Files.readString(filePath).trim();
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle exception
+            System.err.println("Error loading searched city: " + e.getMessage());
         }
         return null;
     }
@@ -419,6 +415,7 @@ public class WeatherApp extends Application {
      * @return ImageView containing the weather icon.
      */
     private ImageView getIcon(int weatherCode) {
+        // Categorize weathers
         List<Integer> lightrainthunderstorm = new ArrayList<>(Arrays.asList(200, 230, 231));
         List<Integer> heavythunderstorm = new ArrayList<>(Arrays.asList(201, 202, 211, 212, 221, 232));
         List<Integer> lightthunderstorm = new ArrayList<>(Arrays.asList(210));
@@ -440,12 +437,16 @@ public class WeatherApp extends Application {
         // clear sky by defalt 
         Image weatherIcon = new Image(new File("icons/sun.png").toURI().toString());
 
-        if (lightrainthunderstorm.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/storm-light-rain.png").toURI().toString());
-        } else if (heavythunderstorm.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/storm-with-heavy-rain.png").toURI().toString());
-        } else if (lightthunderstorm.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/storm-light.png").toURI().toString());
+        if (clouds.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/cloud.png").toURI().toString());
+        } else if (heavysnow.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/snowy.png").toURI().toString());
+        } else if (lightsnow.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/light-snow.png").toURI().toString());
+        } else if (partlycloudy.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/partly-cloudy.png").toURI().toString());
+        } else if (mostlysunny.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/mostlysunny.png").toURI().toString());  
         } else if (drizzle.contains(weatherCode)) {
             weatherIcon = new Image(new File("icons/drizzle.png").toURI().toString());
         } else if (lightrain.contains(weatherCode)) {
@@ -453,23 +454,19 @@ public class WeatherApp extends Application {
         } else if (rain.contains(weatherCode)) {
             weatherIcon = new Image(new File("icons/rain.png").toURI().toString());
         } else if (heavyrain.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/heavy-rain.png").toURI().toString());
-        } else if (heavysnow.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/snowy.png").toURI().toString());
-        } else if (lightsnow.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/light-snow.png").toURI().toString());
+            weatherIcon = new Image(new File("icons/heavy-rain.png").toURI().toString());      
+        } else if (mistandfog.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/mist.png").toURI().toString());
+        } else if (lightrainthunderstorm.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/storm-light-rain.png").toURI().toString());
+        } else if (heavythunderstorm.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/storm-with-heavy-rain.png").toURI().toString());
+        } else if (lightthunderstorm.contains(weatherCode)) {
+            weatherIcon = new Image(new File("icons/storm-light.png").toURI().toString());
         } else if (sleet.contains(weatherCode)) {
             weatherIcon = new Image(new File("icons/sleet.png").toURI().toString());
         } else if (atmosphere.contains(weatherCode)) {
             weatherIcon = new Image(new File("icons/smoke.png").toURI().toString());
-        } else if (clouds.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/cloud.png").toURI().toString());
-        } else if (partlycloudy.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/partly-cloudy.png").toURI().toString());
-        } else if (mostlysunny.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/mostlysunny.png").toURI().toString());
-        } else if (mistandfog.contains(weatherCode)) {
-            weatherIcon = new Image(new File("icons/mist.png").toURI().toString());
         } else if (tornado.contains(weatherCode)) {
             weatherIcon = new Image(new File("icons/hurricane.png").toURI().toString());
         } else if (duststorm.contains(weatherCode)) {
@@ -489,10 +486,7 @@ public class WeatherApp extends Application {
      * @return Button for quitting the application.
      */
     private Button getQuitButton() {
-        //Creating a button.
         Button quitButton = new Button("Quit");
-
-        //Adding an event to the button to terminate the application.
         quitButton.setOnAction((ActionEvent event) -> {
             Platform.exit();
         });
@@ -506,9 +500,7 @@ public class WeatherApp extends Application {
      * @return Button for searching and accessing favourites.
      */
     private Button getSearchButton() {
-        // Create a MenuBar
         Button searchButton = new Button("Search and Favorites");
-
         searchButton.setOnAction(e -> openSearchWindow());
 
         return searchButton;
@@ -526,36 +518,35 @@ public class WeatherApp extends Application {
 
             // Top section: TextField and Button
             VBox topSection = new VBox(10);
-            topSection.setAlignment(Pos.CENTER); // Center align the entire top section
-
+            topSection.setAlignment(Pos.CENTER);
+            
+            // Info text for error cases
             secondWindowInfoText = new Text("");
-            secondWindowInfoText.setFill(Color.RED); // Set text color to red
+            secondWindowInfoText.setFill(Color.RED);
             
             // Create TextField for city name input
             cityTextField = new TextField();
             cityTextField.setPromptText("Enter city name");
             cityTextField.setMaxWidth(200);
 
-            // Create Search Button and define its behavior
+            // Create Search Button and set it on action
             Button searchButton = new Button("Search");
-            searchButton.setStyle("-fx-background-color: lightblue; -fx-background-radius: 10;"); // Pastel Pink with dark pink border and rounded corners
+            searchButton.setStyle("-fx-background-color: lightblue; -fx-background-radius: 10;");
             searchButton.setOnAction(e -> {
                 // Get city name from the TextField, perform search, and close the window
-                String cityName = cityTextField.getText().trim(); // Trim to remove leading and trailing whitespace
+                String cityName = cityTextField.getText().trim(); // Trim to remove whitespace
                 if (!cityName.isEmpty()) {
                     performSearch(cityName);
                     secondWindowInfoText.setText("");
                     searchStage.close();
                 } else {
-                    // Display a message or log that no city name was entered
-                    System.out.println("No city name entered."); // Or update a UI element with this message
                     secondWindowInfoText.setText("Please type a city name.");
                 }
             });
 
-             // Create "Add to Favorites" Button and define its behavior
+            // Create "Add to Favorites" Button and set it on action
             Button addToFavoritesButton = new Button("Add to Favorites");
-            addToFavoritesButton.setStyle("-fx-background-color: lightblue; -fx-background-radius: 10;"); // Pastel Yellow with dark yellow border and rounded corners
+            addToFavoritesButton.setStyle("-fx-background-color: lightblue; -fx-background-radius: 10;");
             addToFavoritesButton.setOnAction(e -> {
                 // Get city name from the TextField and add it to favorites
                 String cityName = cityTextField.getText();
@@ -576,13 +567,12 @@ public class WeatherApp extends Application {
             menuBar = new MenuBar();
             menuBar.getMenus().add(favoritesMenu);
 
-            // Load favorites
             loadFavorites();
 
             // Wrap the MenuBar in an HBox for better alignment and sizing
             HBox menuBarContainer = new HBox(menuBar);
-            menuBarContainer.setAlignment(Pos.CENTER); // Center the MenuBar within the HBox
-            menuBar.setMaxWidth(80); // Set preferred width to make the MenuBar smaller
+            menuBarContainer.setAlignment(Pos.CENTER); 
+            menuBar.setMaxWidth(80); 
 
             topSection.getChildren().addAll(secondWindowInfoText, cityTextField, buttonLayout, menuBar);
 
@@ -605,8 +595,8 @@ public class WeatherApp extends Application {
     }
     
     /**
-    * Loads favorite cities from the "favorites" file and populates the favoritesMenu.
-    * Clears existing items in the menu before adding the loaded favorites.
+    * Loads favourite cities from the "favourites" file and populates the favoritesMenu.
+    * Clears existing items in the menu before adding the loaded favourites.
     */
     private void loadFavorites() {
         try {
@@ -619,16 +609,16 @@ public class WeatherApp extends Application {
                 favoritesMenu.getItems().add(menuItem);
             }
         } catch (IOException e) {
-            // Handle exception
+            System.err.println("Error loading favorites: " + e.getMessage());
 
         }
     }
 
     /**
-    * Adds the specified city to the favorites list, saving it to the "favorites" file.
-    * Checks if the city is already a favorite before adding, and updates UI accordingly.
+    * Adds the specified city to the favourites list, saving it to the "favourites" file.
+    * Checks if the city is already a favourite before adding, and updates UI accordingly.
     * Handles exceptions and displays appropriate messages.
-    * @param cityName The name of the city to be added to favorites.
+    * @param cityName The name of the city to be added to favourites.
     */
     private void addToFavorites(String cityName) {
         try {
@@ -675,13 +665,13 @@ public class WeatherApp extends Application {
             ReadFile file = new ReadFile();
             file.readFromFile("weatherData");
 
-            hourlyWeatherList = file.getHourlyWeather(); // Update hourlyWeatherList
+            hourlyWeatherList = file.getHourlyWeather();
             dailyWeatherList = file.getDailyWeather();
             currentWeather = file.getCurrentWeather();
             Platform.runLater(this::updateAllWeatherSections);
 
         } catch (IOException e) {
-            // Handle exception
+            System.err.println("Error searching for a city: " + e.getMessage());
         }
 
         saveLastSearchedCity(cityName);

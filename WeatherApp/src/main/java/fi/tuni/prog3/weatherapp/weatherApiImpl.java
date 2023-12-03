@@ -8,7 +8,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-// yhdistä toistuva koodi yhdeksi funktioksi?
 
 public class weatherApiImpl implements iAPI {
     private final String apiKey = "b201aa400ba5bdc211c7bbf93e38162f"; 
@@ -91,7 +90,6 @@ public class weatherApiImpl implements iAPI {
             }
         } catch (IOException | InterruptedException e) {
             System.err.println("Error making the current weather API call: " + e.getMessage());
-            e.printStackTrace();
         }
         return currentJsonData;
     }
