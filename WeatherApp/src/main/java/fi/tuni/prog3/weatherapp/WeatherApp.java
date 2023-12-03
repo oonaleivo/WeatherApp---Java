@@ -30,6 +30,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -105,11 +106,21 @@ public class WeatherApp extends Application {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
+        // Wrap the ScrollPane in a StackPane
+        StackPane scrollPaneContainer = new StackPane(scrollPane);
+        scrollPaneContainer.setStyle(
+            "-fx-background-radius: 10; " +
+            "-fx-background-color: #157C9D; " +
+            "-fx-border-color: #A2CEDC; " + // Translucent white border
+            "-fx-border-width: 3; " +
+            "-fx-border-radius: 10;"
+        );
+
         // Create a VBox to hold the sections
         VBox root = new VBox(10); // 10 is the spacing between sections
         root.setPadding(new Insets(10));
-        root.setStyle("-fx-background-color: linear-gradient(to bottom, #157C9D, #0FABDD);");
-        root.getChildren().addAll(menuSection, currentSection, hourlySection, scrollPane, dailySection);
+        root.setStyle("-fx-background-color: linear-gradient(to bottom, #0076B5, #5CC6FF);");
+        root.getChildren().addAll(menuSection, currentSection, hourlySection, scrollPaneContainer, dailySection);
 
         // Create the scene
         Scene scene = new Scene(root, 600, 750);
@@ -209,8 +220,8 @@ public class WeatherApp extends Application {
 
         // Set style
         hourlySection.setPrefWidth(80 * 24);
-        hourlySection.setStyle("-fx-background-radius: 10; -fx-background-color: #A2CEDC;"); 
-        hourlySection.setPrefHeight(200);
+        hourlySection.setStyle(" -fx-background-color: #69B7DF;"); 
+        hourlySection.setPrefHeight(138);
 
         updateAllWeatherSections();
 
@@ -241,7 +252,7 @@ public class WeatherApp extends Application {
             minLabel.setStyle("-fx-font: 14 Calibri;");
             day.getChildren().addAll(dateLabel, dailyIcon, minLabel ,maxLabel);
             day.setAlignment(Pos.CENTER);
-            day.setStyle("-fx-background-radius: 10; -fx-background-color: #A2CEDC;");
+            day.setStyle("-fx-background-radius: 10; -fx-background-color: #69B7DF;");
             day.setPadding(new Insets(15));
             dailySection.getChildren().add(day);
         }
