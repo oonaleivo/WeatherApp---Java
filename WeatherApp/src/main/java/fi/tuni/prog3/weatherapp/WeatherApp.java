@@ -382,7 +382,7 @@ public class WeatherApp extends Application {
      *
      * @param cityName The name of the city to be saved.
      */
-    private void saveLastSearchedCity(String cityName) {
+    void saveLastSearchedCity(String cityName) {
         try {
             Path filePath = Paths.get("lastSearchedCity.txt");
             Files.writeString(filePath, cityName);
@@ -396,7 +396,7 @@ public class WeatherApp extends Application {
      *
      * @return The last searched city.
      */
-    private String loadLastSearchedCity() {
+    String loadLastSearchedCity() {
         try {
             Path filePath = Paths.get("lastSearchedCity.txt");
             if (Files.exists(filePath)) {
@@ -414,7 +414,7 @@ public class WeatherApp extends Application {
      * @param weatherCode The code representing the weather conditions.
      * @return ImageView containing the weather icon.
      */
-    private ImageView getIcon(int weatherCode) {
+    ImageView getIcon(int weatherCode) {
         // Categorize weathers
         List<Integer> lightrainthunderstorm = new ArrayList<>(Arrays.asList(200, 230, 231));
         List<Integer> heavythunderstorm = new ArrayList<>(Arrays.asList(201, 202, 211, 212, 221, 232));
@@ -485,7 +485,7 @@ public class WeatherApp extends Application {
      *
      * @return Button for quitting the application.
      */
-    private Button getQuitButton() {
+    Button getQuitButton() {
         Button quitButton = new Button("Quit");
         quitButton.setOnAction((ActionEvent event) -> {
             Platform.exit();
@@ -499,7 +499,7 @@ public class WeatherApp extends Application {
      *
      * @return Button for searching and accessing favourites.
      */
-    private Button getSearchButton() {
+    Button getSearchButton() {
         Button searchButton = new Button("Search and Favorites");
         searchButton.setOnAction(e -> openSearchWindow());
 
