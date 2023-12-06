@@ -95,12 +95,11 @@ public class WeatherApp extends Application {
         int sunsetTimeInt = Integer.parseInt(currentWeather.getSunset());
         int sunriseTimeInt = Integer.parseInt(currentWeather.getSunrise());
         
-        if (currentTimeInt < sunsetTimeInt && currentTimeInt >= sunriseTimeInt) {
-            dayTime = true;
-        }
-        else {
-            dayTime = false;
-        }
+        System.out.println("current time: " + currentTimeInt + " sunset: " + sunsetTimeInt + " sunrise: " + sunriseTimeInt);
+        
+        dayTime = currentTimeInt < sunsetTimeInt && currentTimeInt >= sunriseTimeInt; 
+        
+        System.out.println(dayTime);
 
         // Create the main sections
         HBox menuSection = createMenuSection();
@@ -287,7 +286,7 @@ public class WeatherApp extends Application {
             day.getChildren().addAll(dateLabel, dailyIcon, minLabel ,maxLabel);
             day.setAlignment(Pos.CENTER);
             if (dayTime) {
-                day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(129, 212, 250, 0.5);");
+                day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(79, 195, 247, 0.7);");
             }
             else {
                 day.setStyle("-fx-background-radius: 10; -fx-background-color: rgba(159, 168, 218, 0.5);");
