@@ -2,16 +2,25 @@ package fi.tuni.prog3.weatherapp;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-
+/**
+* Implementation of the iAPI interface for interacting with the OpenWeatherMap API.
+*/
 public class weatherApiImpl implements iAPI {
     private final String apiKey = "b201aa400ba5bdc211c7bbf93e38162f"; 
 
+    /**
+     * Looks up the geographical coordinates (latitude and longitude) for a given location.
+     *
+     * @param loc The location for which coordinates are to be looked up.
+     * @return A string containing the coordinates".
+     */
     @Override
     public String lookUpLocation(String loc) {
         String coordinates = "";
@@ -49,7 +58,7 @@ public class weatherApiImpl implements iAPI {
             } else {
                 System.out.println("Failed to get location information. Status code: " + response.statusCode());
             }
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException | InterruptedException e) {
             System.err.println("Error making the location API call: " + e.getMessage());
         }
         getCurrentWeather(latitude, longitude);
@@ -58,6 +67,13 @@ public class weatherApiImpl implements iAPI {
         return coordinates;
     }
 
+    /**
+     * Retrieves the current weather data for a given set of coordinates.
+     *
+     * @param lat The latitude of the location.
+     * @param lon The longitude of the location.
+     * @return A string containing the JSON data for the current weather information.
+     */
     @Override
     public String getCurrentWeather(double lat, double lon) {
         String currentJsonData = "";
@@ -94,6 +110,13 @@ public class weatherApiImpl implements iAPI {
         return currentJsonData;
     }
 
+    /**
+     * Retrieves the hourly forecast data for a given set of coordinates.
+     *
+     * @param lat The latitude of the location.
+     * @param lon The longitude of the location.
+     * @return A string containing the JSON data for the hourly forecast information.
+     */
     @Override
     public String getHourlyForecast(double lat, double lon) {
         String hourlyJsonData = "";
@@ -130,6 +153,13 @@ public class weatherApiImpl implements iAPI {
         return hourlyJsonData;
 }
    
+    /**
+     * Retrieves the daily forecast data for a given set of coordinates.
+     *
+     * @param lat The latitude of the location.
+     * @param lon The longitude of the location.
+     * @return A string containing the JSON data for the daily forecast information.
+     */
     @Override
     public String getDailyForecast(double lat, double lon) {
                 String dailyJsonData = "";

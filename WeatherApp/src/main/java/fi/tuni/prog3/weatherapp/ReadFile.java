@@ -16,6 +16,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+/**
+ * Implementation of the iReadAndWriteToFile interface for reading and writing weather data to files.
+ */
 public class ReadFile implements iReadAndWriteToFile {
 
     private String dataToWrite;
@@ -23,36 +26,54 @@ public class ReadFile implements iReadAndWriteToFile {
     private String hourlyJsonData;
     private String dailyJsonData;
 
+    /**
+     * Sets the data to be written to a file.
+     *
+     * @param data The data to be written.
+     */
     public void setDataToWrite(String data) {
         this.dataToWrite = data;
     }
 
-    //miksi palauttaa boolean. käytetäänkö me sitä missään?
+    /**
+     * Reads weather data from files in a specified folder.
+     *
+     * @param folderName The name of the folder containing weather data files.
+     * @return True if reading is successful, false otherwise.
+     * @throws IOException If an I/O error occurs.
+     */
     @Override
     public boolean readFromFile(String folderName) throws IOException {
         Path folderPath = Paths.get(folderName);
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(folderPath)) {
             for (Path file : stream) {
                 String fileContent = Files.readString(file);
-                if (file.getFileName().toString().equals("currentWeatherData")) {
-                    currentJsonData = fileContent;
-                } else if (file.getFileName().toString().equals("hourlyWeatherData")) {
-                    hourlyJsonData = fileContent;
-                } else {
-                    dailyJsonData = fileContent;
+                switch (file.getFileName().toString()) {
+                    case "currentWeatherData":
+                        currentJsonData = fileContent;
+                        break;
+                    case "hourlyWeatherData":
+                        hourlyJsonData = fileContent;
+                        break;
+                    default:
+                        dailyJsonData = fileContent;
+                        break;
                 }
             }
             return true;
         }
     }
     
+    /**
+     * Retrieves and parses the current weather data from JSON and returns it as a CurrentWeather object.
+     *
+     * @return A CurrentWeather object containing the parsed current weather data.
+     */
     public CurrentWeather getCurrentWeather() {
         JsonObject jsonObject = JsonParser.parseString(currentJsonData).getAsJsonObject();
         double rain;
-        // Extracting required data
+        // Saving the needed data
         double currentTemp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
-        double tempMin = jsonObject.getAsJsonObject("main").get("temp_min").getAsDouble();
-        double tempMax = jsonObject.getAsJsonObject("main").get("temp_max").getAsDouble();
         double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble();
         int clouds = jsonObject.getAsJsonObject("clouds").get("all").getAsInt();
         int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
@@ -76,16 +97,25 @@ public class ReadFile implements iReadAndWriteToFile {
         LocalDateTime sunriseTime = convertTimestampToDate(sunriseLong);
         String sunrise = sunriseTime.format(formatter);
 
-        CurrentWeather weatherData = new CurrentWeather(currentTemp, tempMin, tempMax, feelsLike, clouds, humidity, cityName, rain , wind, description, weatherCode, sunset, sunrise);
-        
-        return weatherData;
+        return new CurrentWeather(currentTemp, feelsLike, clouds, humidity, cityName, rain , wind, description, weatherCode, sunset, sunrise);
     }
     
+    /**
+     * Converts a Unix timestamp to a LocalDateTime object.
+     *
+     * @param timestamp The timestamp to be converted.
+     * @return The LocalDateTime object.
+     */
     public LocalDateTime convertTimestampToDate(long timestamp) {
         Instant instant = Instant.ofEpochSecond(timestamp);
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
     
+    /**
+     * Retrieves and parses the hourly forecast data from JSON and returns it as a list of HourlyWeather objects.
+     *
+     * @return A list of HourlyWeather objects containing the parsed hourly forecast data.
+     */
     public ArrayList<HourlyWeather> getHourlyWeather() {
         ArrayList<HourlyWeather> hourlyWeatherList = new ArrayList<>();
         
@@ -111,6 +141,11 @@ public class ReadFile implements iReadAndWriteToFile {
         return hourlyWeatherList;
     }
     
+    /**
+     * Retrieves and parses the daily forecast data from JSON and returns it as a list of DailyWeather objects.
+     *
+     * @return A list of DailyWeather objects containing the parsed daily forecast data.
+     */
     public ArrayList<DailyWeather> getDailyWeather() {
         ArrayList<DailyWeather> dailyWeatherList = new ArrayList<>();
         
@@ -140,7 +175,13 @@ public class ReadFile implements iReadAndWriteToFile {
         return dailyWeatherList;  
     }
 
-    //tarkistetaanko me boolean palautusta missään? voisko olla vaan void
+    /**
+     * Writes the stored data to a file with the specified name.
+     *
+     * @param fileName The name of the file to which data will be written.
+     * @return True if writing is successful, false otherwise.
+     * @throws IOException If an I/O error occurs.
+     */
     @Override
     public boolean writeToFile(String fileName) throws IOException {
         if (dataToWrite == null) {
@@ -159,5 +200,4 @@ public class ReadFile implements iReadAndWriteToFile {
             return false;
         }
     }
-
 }

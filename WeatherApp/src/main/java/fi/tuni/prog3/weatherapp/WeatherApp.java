@@ -35,37 +35,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
- * Main WeatherApp class that extends JavaFX Application.
+ * The main class for the WeatherApp application.
  */
-//git add 
-//git stash --staged
-//git pull
-//git stash apply
-//git add
-//git commit
-//git push
-
-/* Kooditorio muutokset:
-
-Image weatherIcon = new Image(new File("icons/sun.png").toURI().toString());
-
-Lue kaikki tiedostot jostain kansiosta: (ei tarvis yks kerrallaan)
-https://stackoverflow.com/questions/1844688/how-to-read-all-files-in-a-folder-from-java
-
-https://openweathermap.org/forecast16 dt on timestamp päiville, voi muuttaa localdate + localdatetime 
-luokilla saa muutettua päiviksi. */
-
-// pitää lisää error handling noigin keltasiin printstacktrace juttuihin
-// tarkistetaan kaikki kommentit ja poistetaan testitulostukset
-// yksikkötestit
-
 public class WeatherApp extends Application {
 
     private Stage searchStage;
     private CurrentWeather currentWeather;
     private ArrayList<DailyWeather> dailyWeatherList;
     private ArrayList<HourlyWeather> hourlyWeatherList;
-    private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel, description;
+    private Label locationLabel, tempLabel, feelsLikeLabel, rainLabel, windLabel, humLabel, description, sunsetLabel, sunriseLabel;
     private ImageView icon;
     private HBox hourlySection = new HBox(10);
     private HBox dailySection = new HBox(10);
@@ -73,8 +51,15 @@ public class WeatherApp extends Application {
     private MenuBar menuBar;
     private Text secondWindowInfoText;
     private TextField cityTextField;
+    private int currentTime, sunsetTime, sunriseTime;
     private boolean dayTime;
 
+    /**
+     * The main entry point for the application.
+     *
+     * @param stage The primary stage for the application.
+     * @throws IOException If an error occurs during the application execution.
+     */
     @Override
     public void start(Stage stage) throws IOException {
         // get the weather of the last searched city
@@ -91,15 +76,11 @@ public class WeatherApp extends Application {
         hourlyWeatherList = file.getHourlyWeather();
         
         // Check if it is day time or night time currently
-        int currentTimeInt = Integer.parseInt(hourlyWeatherList.get(0).getTime());
-        int sunsetTimeInt = Integer.parseInt(currentWeather.getSunset());
-        int sunriseTimeInt = Integer.parseInt(currentWeather.getSunrise());
-        
-        System.out.println("current time: " + currentTimeInt + " sunset: " + sunsetTimeInt + " sunrise: " + sunriseTimeInt);
-        
-        dayTime = currentTimeInt < sunsetTimeInt && currentTimeInt >= sunriseTimeInt; 
-        
-        System.out.println(dayTime);
+        currentTime = Integer.parseInt(hourlyWeatherList.get(0).getTime());
+        sunsetTime = Integer.parseInt(currentWeather.getSunset());
+        sunriseTime = Integer.parseInt(currentWeather.getSunrise());
+              
+        dayTime = currentTime <= sunsetTime && currentTime >= sunriseTime; 
 
         // Create the main sections
         HBox menuSection = createMenuSection();
@@ -191,6 +172,10 @@ public class WeatherApp extends Application {
         humLabel.setTextFill(Color.WHITE);
         description = new Label();
         description.setTextFill(Color.WHITE);
+        sunsetLabel = new Label();
+        sunsetLabel.setTextFill(Color.WHITE);
+        sunriseLabel = new Label();
+        sunriseLabel.setTextFill(Color.WHITE);
         icon = getIcon(currentWeather.getWeatherCode());
 
         // Create a grid to hold the labels
@@ -208,6 +193,8 @@ public class WeatherApp extends Application {
         currentInfo.add(rainLabel, 0, 4);
         currentInfo.add(windLabel, 1, 4);
         currentInfo.add(humLabel, 2, 4);
+        currentInfo.add(sunriseLabel, 0, 5);
+        currentInfo.add(sunsetLabel, 1, 5);
 
         // Create a HBox to hold the icon and currentInfo grid
         HBox currentSection = new HBox(30);
@@ -308,7 +295,7 @@ public class WeatherApp extends Application {
      * Update the content of all weather sections with new data.
      */
     private void updateAllWeatherSections() {
-        // Update content with new data
+        // Update hourly content with new data
         if (hourlyWeatherList != null && !hourlyWeatherList.isEmpty()) {
             int index = 0;
             for (HourlyWeather data : hourlyWeatherList) {
@@ -334,11 +321,10 @@ public class WeatherApp extends Application {
             }
         }
         
-        // Update content with new data
+        // Update daily content with new data
         if (dailyWeatherList != null && !dailyWeatherList.isEmpty()) {
             int index = 0;
             for (DailyWeather data : dailyWeatherList) {
-                // Assuming dailySection is an HBox containing your existing daily data
                 if (index < dailySection.getChildren().size()) {
                     VBox day = (VBox) dailySection.getChildren().get(index);
 
@@ -363,6 +349,7 @@ public class WeatherApp extends Application {
             }
         }
         
+        // Update current content with new data
         if (currentWeather != null) {
             locationLabel.setText(currentWeather.getCityName());
             tempLabel.setText(String.format("%.1f ℃", currentWeather.getCurrentTemp()));
@@ -371,6 +358,8 @@ public class WeatherApp extends Application {
             windLabel.setText(String.format("Wind: %.1f m/s", currentWeather.getWind()));
             humLabel.setText(String.format("Humidity: %d %%", currentWeather.getHumidity()));
             description.setText(currentWeather.getDescription());
+            sunsetLabel.setText(String.format("Sunset at %d", sunsetTime));
+            sunriseLabel.setText(String.format("Sunrise at %d", sunriseTime));
             icon.setImage(getIcon(currentWeather.getWeatherCode()).getImage());
         }        
     }
