@@ -1,1 +1,2 @@
 {"coord":{"lon":23.7603,"lat":61.498},"weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04n"}],"base":"stations","main":{"temp":-8.62,"feels_like":-15.62,"temp_min":-9.23,"temp_max":-7.82,"pressure":1029,"humidity":91},"visibility":10000,"wind":{"speed":5.81,"deg":95,"gust":7.6},"clouds":{"all":100},"dt":1702050089,"sys":{"type":2,"id":2081862,"country":"FI","sunrise":1702020392,"sunset":1702040824},"timezone":7200,"id":661226,"name":"Amuri","cod":200}
+
