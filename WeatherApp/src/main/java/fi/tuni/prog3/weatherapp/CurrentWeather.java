@@ -8,7 +8,7 @@ public class CurrentWeather {
     private final double feelsLike;
     private final int clouds;
     private final int humidity;
-    private final String cityName;
+    public final String cityName;
     private final double rain;
     private final double wind;
     private final String description;
