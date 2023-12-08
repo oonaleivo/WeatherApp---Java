@@ -65,7 +65,7 @@ public class WeatherApp extends Application {
         // get the weather of the last searched city
         String lastSearchedCity = loadLastSearchedCity();
         if (lastSearchedCity == null || lastSearchedCity.isEmpty()) {
-            lastSearchedCity = "Tampere"; // Replace with a default city name
+            lastSearchedCity = "Helsinki"; // Replace with a default city name
         }
         weatherApiImpl weatherApi = new weatherApiImpl();
         weatherApi.lookUpLocation(lastSearchedCity);

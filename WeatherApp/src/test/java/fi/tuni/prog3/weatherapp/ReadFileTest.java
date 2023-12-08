@@ -6,21 +6,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.EnumSet;
 
-/**
- * Test class for the {@link ReadFile} class.
- */
 public class ReadFileTest {
-    
-    /**
-     * Tests the writeToFile and readFromFile methods of the ReadFile class.
-     */
+
     @Test
     public void testWriteAndReadFromFile() {
         // Arrange
@@ -43,40 +33,13 @@ public class ReadFileTest {
         assertTrue(readSuccess, "File read operation should be successful");
     }
 
-    /**
-     * Cleans up folders and files created during the test.
-     */
     @AfterAll
     public static void cleanup() {
-        // Clean up folders and files created during the test
+        // Clean up the testFile.txt
         try {
-            Files.walkFileTree(Path.of("weatherData"), EnumSet.noneOf(FileVisitOption.class), Integer.MAX_VALUE, new SimpleFileVisitor());
+            Files.deleteIfExists(Path.of("weatherData", "testFile.txt"));
         } catch (IOException e) {
         }
     }
-    
-    /**
-     * SimpleFileVisitor implementation for deleting files and directories.
-     */
-    private static class SimpleFileVisitor extends java.nio.file.SimpleFileVisitor<Path> {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-        }
-        
-        /**
-         * Deletes a visited directory after all its entries have been visited.
-         *
-         * @param dir The path of the directory to be deleted.
-         * @param exc An I/O exception that occurred during the visit.
-         * @return The file visit result.
-         * @throws IOException If an I/O error occurs.
-         */
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            Files.delete(dir);
-            return FileVisitResult.CONTINUE;
-        }
-    }
 }
+
