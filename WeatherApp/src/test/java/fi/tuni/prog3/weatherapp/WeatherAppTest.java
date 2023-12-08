@@ -1,38 +1,27 @@
 package fi.tuni.prog3.weatherapp;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+/**
+ * Test class for the non FX methods of WeatherApp class.
+ */
 public class WeatherAppTest {
 
-    public WeatherAppTest() {
-    }
-
-    @BeforeAll
-    public static void setUpClass() {
-        // Perform any one-time setup if needed
-    }
-
-    @AfterAll
-    public static void tearDownClass() {
-        // Perform any one-time cleanup if needed
-    }
-
-    @BeforeEach
-    public void setUp() {
-        // Perform setup before each test if needed
-    }
-
-    @AfterEach
-    public void tearDown() {
-        // Perform cleanup after each test if needed
-    }
-
+    /**
+     * Test saving and loading the last searched city.
+     */
     @Test
-    public void testWeatherAppFunctionality() {
+    public void testSaveAndLoadLastSearchedCity() {
         WeatherApp weatherApp = new WeatherApp();
+
+        // Test saving and loading the last searched city
+        String cityName = "Tampere";
+        weatherApp.saveLastSearchedCity(cityName);
+        String loadedCity = weatherApp.loadLastSearchedCity();
+
+        // Check if the loaded city matches the saved city
+        assertEquals(cityName, loadedCity, "Saved and loaded city should match");
     }
+
 }
