@@ -17,19 +17,19 @@ public class CurrentWeather {
     private final String sunrise;
     
     /**
-     * Constructs a CurrentWeather object with the specified weather information.
+     * Constructs a new instance of CurrentWeather with the specified parameters.
      *
-     * @param currentTemp The current temperature.
-     * @param feelsLike The "feels like" temperature.
-     * @param clouds The cloud cover percentage.
-     * @param humidity The humidity percentage.
-     * @param cityName The name of the city.
-     * @param rain The amount of rain in the last hour.
-     * @param wind The wind speed.
-     * @param description The weather condition description.
-     * @param weatherCode The weather code.
-     * @param sunset The time of sunset.
-     * @param sunrise The time of sunrise.
+     * @param currentTemp   The current temperature.
+     * @param feelsLike     The temperature that it feels like.
+     * @param clouds        The cloudiness percentage.
+     * @param humidity      The humidity percentage.
+     * @param cityName      The name of the city.
+     * @param rain          The amount of rainfall.
+     * @param wind          The wind speed.
+     * @param description   The weather description.
+     * @param weatherCode   The weather condition code.
+     * @param sunset        The time of sunset.
+     * @param sunrise       The time of sunrise.
      */
     public CurrentWeather(double currentTemp, double feelsLike, int clouds, int humidity, String cityName, double rain, double wind, String description, int weatherCode, String sunset, String sunrise) {
         this.currentTemp = currentTemp;
