@@ -1,17 +1,22 @@
-# Ohjelmointi 3 projektin tietovarasto
+# Programming 3 project repository - WeatherApp
 
-Tämä on ryhmäsi yhteinen tietovarasto projektin tekemistä varten. Huomaa, että nyt
-projektissa on useita jäseniä ja tekemisesi vaikuttaa muiden työhön. Liitä harjoitustyön
-materiaalien etätietovarasto (https://course-gitlab.tuni.fi/compcs140-fall2023/group_template_project)
-paikalliseen tietovarastoosi remoteksi, jotta voit ladata kurssin tarjoamaa materiaalia.
+This is our weather application that provides users with a graphical interface for browsing weather forecasts. 
 
-Tätä tiedostoa saa (ja on hyväkin) muuttaa projektin aloittamisen jälkeen.
+It includes the following features:
+Graphical User Interface: The application offers a graphical interface that enables browsing of weather forecasts.
+Favorite Locations: Users can save their preferred locations as favorites, making it easier to access forecasts for these areas later.
+Save last searched city: The application saves the user's state, including the current location and favorites, to the disk. This information is retrieved when the application is restarted.
+Detailed Forecast: WeatherApp presents a detailed forecast, including hourly forecasts and daily summaries. 
+Custom Icons: The program utilizes its own set of icons, different from those provided by the weather data service, to offer a visual representation of weather conditions.
+Error Handling in File Processing: The application effectively manages file processing errors, providing user notifications about any issues encountered.
+Unit Tests: The program includes unit tests to ensure its functionality, helping to identify and correct potential errors.
 
-# Programming 3 project repository
+Technologies Used: 
+Java
+JavaFX for the UI
+OpenWeather API
 
-This is the repository for implementing the course project for your group. Note that
-your project now has several members and what you do impacts other's work. Add the remote
-repository for the project material (https://course-gitlab.tuni.fi/compcs140-fall2023/group_template_project)
-as a remote to your local repository to fetch the code provided by the course.
+Contact Information:
+oona.leivo@tuni.fi
+reetta.koskinen@tuni.fi
 
-You are allowed (and probably should) make changes to this file after you have started your project.
